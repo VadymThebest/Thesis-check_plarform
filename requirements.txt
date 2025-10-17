@@ -1,3 +1,8 @@
 asgiref==3.10.0
 Django==5.2.7
 sqlparse==0.5.3
+djangorestframework==3.15.1
+spacy>=3.7.2
+scikit-learn==1.5.2
+PyPDF2==3.0.1
+python-docx==1.1.0
