@@ -34,7 +34,7 @@ ROOT_URLCONF = 'thesis_check.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / "templates"],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -56,7 +56,8 @@ DATABASES = {
     }
 }
 
-STATIC_URL = '/static/'
+STATIC_URL = '/assets/'
+STATICFILES_DIRS = [BASE_DIR / "templates" / "assets"]
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
