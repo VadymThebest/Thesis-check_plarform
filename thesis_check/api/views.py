@@ -29,3 +29,8 @@ class ThesisResultView(generics.RetrieveAPIView):
     queryset = ThesisSubmission.objects.all()
     serializer_class = ThesisSubmissionSerializer
     lookup_field = 'id'
+
+
+class ResultView(generics.ListAPIView):
+    queryset = ThesisSubmission.objects.all()
+    serializer_class = ThesisSubmissionSerializer

@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}Upload Thesis | Thesis Check Platform{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        
+        <div class="card shadow-sm border-0 upload-card">
+            <div class="card-body p-4 p-md-5 text-center">
+                
+                <h1 class="h3 mb-3 fw-light">Thesis Check Platform</h1>
+                <p class="text-muted mb-4">
+                    Upload your thesis for plagiarism, grammar, and format checking.
+                </p>
+
+                <form id="uploadForm" method="POST" enctype="multipart/form-data" action="">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="thesisFile" class="form-label visually-hidden">Select File</label>
+                        <input class="form-control form-control-lg" type="file" id="thesisFile" name="file" required>
+                    </div>
+
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            Check File
+                        </button>
+                    </div>
+                </form>
+                
+                <div id="resultArea" class="mt-4" style="display: none;">
+                    <hr>
+                    <h5 class="text-success">File Uploaded Successfully!</h5>
+                    <p>Now checking...</p>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="text-center text-muted mt-3">
+            <small>&copy; 2025 Your Team Name</small>
+        </div>
+
+    </div>
+</div>
+{% endblock %}
