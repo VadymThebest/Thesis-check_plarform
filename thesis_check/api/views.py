@@ -3,6 +3,25 @@ from rest_framework.response import Response
 from checking.models import ThesisSubmission
 from .serializers import ThesisSubmissionSerializer
 from .nlp import run_plagiarism_and_grammar_check
+from rest_framework_simplejwt.views import TokenObtainPairView
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
+
+class CustomTokenObtainPairView(TokenObtainPairView):
+    @swagger_auto_schema(
+        operation_description="Получить access и refresh JWT токены",
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'email': openapi.Schema(type=openapi.TYPE_STRING),
+                'password': openapi.Schema(type=openapi.TYPE_STRING),
+            },
+            required=['email', 'password']
+        )
+    )          
+    def post(self, request, *args, **kwargs):
+      return super().post(request, *args, **kwargs)
+
 
 class UploadThesisView(generics.CreateAPIView):
     queryset = ThesisSubmission.objects.all()

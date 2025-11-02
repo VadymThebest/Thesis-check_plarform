@@ -6,8 +6,21 @@ from django.core.files.storage import FileSystemStorage
 from django.urls import reverse
 from .models import ThesisSubmission # <-- make sure you have this model
 from api.nlp import run_plagiarism_and_grammar_check  # <-- your analysis logic
+from rest_framework.permissions import IsAuthenticated
+from rest_framework import generics
+from api.serializers import ThesisSubmissionSerializer
+from django.contrib.auth.decorators import login_required
 
 
+class UploadThesisView(generics.CreateAPIView):
+    permission_classes = [IsAuthenticated]  # 👈 защита по токену
+    queryset = ThesisSubmission.objects.all()
+    serializer_class = ThesisSubmissionSerializer
+
+    def perform_create(self, serializer):
+        serializer.save(student=self.request.user, status="processing")
+
+@login_required
 
 def index(request):
     if request.method == "POST" and request.FILES.get("file"):
@@ -18,7 +31,12 @@ def index(request):
         filename = fs.save(uploaded_file.name, uploaded_file)
         file_path = fs.path(filename)
 
-        thesis = ThesisSubmission.objects.create(file=f"uploads/{filename}")
+        thesis = ThesisSubmission.objects.create(
+        file=f"uploads/{filename}",
+        student=request.user,
+        status="processing"
+)
+
 
         print("✅ Redirecting to check page for ID:", thesis.id)
         return redirect(reverse("check", kwargs={"id": thesis.id}))
@@ -26,7 +44,7 @@ def index(request):
     print("⚠️ No file found in POST")
     return render(request, "index.html")
 
-
+@login_required
 
 def check(request, id):
     """
