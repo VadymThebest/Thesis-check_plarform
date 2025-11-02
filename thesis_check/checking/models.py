@@ -17,4 +17,6 @@ class ThesisSubmission(models.Model):
     status = models.CharField(max_length=20, default="processing")
 
     def __str__(self):
+     if self.student and hasattr(self.student, "email"):
         return f"Thesis {self.id} by {self.student.email}"
+     return f"Thesis {self.id} (без пользователя)"
