@@ -15,6 +15,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'pgvector.django',
     'checking',
     'api',
 ]
@@ -50,15 +51,19 @@ TEMPLATES = [
 WSGI_APPLICATION = 'thesis_check.wsgi.application'
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": "postgres",
+        "USER": "postgres",
+        "PASSWORD": "postgres",
+        "HOST": "localhost",
+        "PORT": "5432",
     }
 }
 
 STATIC_URL = '/assets/'
-STATICFILES_DIRS = [BASE_DIR / "templates" / "assets"]
-MEDIA_URL = '/media/'
+STATICFILES_DIRS = [BASE_DIR / "templates", BASE_DIR / "assets"]
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_URL = '/media/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

@@ -1,4 +1,5 @@
 from django.db import models
+from pgvector.django import VectorField
 
 class ThesisSubmission(models.Model):
     student_id = models.CharField(max_length=50)
@@ -11,3 +12,9 @@ class ThesisSubmission(models.Model):
 
     def __str__(self):
         return f"Thesis {self.id} by {self.student_id}"
+    
+
+class Article(models.Model):
+    title = models.TextField(max_length=255)
+    content = models.TextField()
+    embedding = VectorField(dimensions=768)
