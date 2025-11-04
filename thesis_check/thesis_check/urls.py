@@ -22,17 +22,11 @@ schema_view = get_schema_view(
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
+    
     path('', register_view, name='site_register'),
     path('accounts/login/', auth_views.LoginView.as_view(template_name='login.html'), name='login'),
     path('accounts/logout/', auth_views.LogoutView.as_view(),name='logout'),
     path('index/', include("checking.urls")),
->>>>>>> 7270fd19 (JWT and API registration maded/Login and Logut in web sessions maded)
-=======
-    path("", include("checking.urls")),
->>>>>>> backend_batman
     path('api/v1/', include('api.urls')),
     path('api/users/', include('users.urls')),
     path('api/v1/token/', TokenObtainPairView.as_view(), name='token_obtain_pair_direct'),
