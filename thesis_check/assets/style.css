@@ -1,28 +1,40 @@
-/* Google'dan daha modern bir font çekelim (Opsiyonel ama güzel) */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700&display=swap');
+/* Google'dan yazı tipi çekme */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap');
 
+/* 1. ARKA PLAN FOTOĞRAFI BÖLÜMÜ */
 body {
     font-family: 'Inter', sans-serif;
-    background-color: #f8f9fa; /* Hafif gri bir arka plan */
     
-    /* İçeriği dikey olarak ortalamak için */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 100vh;
+    /* ÇOK ÖNEMLİ: 
+      Fotoğrafın adı "backgraund.jpg" (o harfi yok)
+      ve style.css'ten 2 klasör yukarıda.
+    */
+    background-image: url('../../backgraund.jpg');
+    
+    background-size: cover;          /* Tüm ekranı kapla */
+    background-position: center;     /* Ortala */
+    background-repeat: no-repeat;    /* Tekrar etme */
+    background-attachment: fixed;    /* Kaydırınca arka plan kaysın */
+    min-height: 100vh;               /* En az ekran boyutu kadar yer kapla */
+    
+    /* Arka planın çok parlak olmaması için hafif karartma */
+    /* Bu satırı beğenmezsen silebilirsin */
+    background-color: rgba(0, 0, 0, 0.3);
+    background-blend-mode: darken;
 }
 
-.upload-card {
-    border-radius: 1rem; /* Daha yumuşak kenarlar */
-    transition: all 0.3s ease;
+/* 2. ORTADAKİ BEYAZ KUTU (ANA İÇERİK) */
+main.container {
+    background-color: rgba(255, 255, 255, 0.98); /* Hafif şeffaf beyaz */
+    padding: 2.5rem 3rem;
+    border-radius: 15px;
+    margin-top: 5rem;    /* Üstteki navbar'dan boşluk */
+    margin-bottom: 5rem; /* Alttan boşluk */
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
 }
 
-.upload-card:hover {
-    box-shadow: 0 .5rem 1rem rgba(0,0,0,.1)!important; /* Vurgu için gölge */
-}
-
-/* Dosya yükleme kutusunu biraz daha çekici hale getirelim */
-.form-control-lg {
-    padding: 1rem 1.5rem;
-    font-size: 1rem;
+/* Dosya yükleme butonunu biraz daha çekici hale getirelim */
+/* Bu kısım senin kodunda vardı, koruyoruz */
+.form-control:hover {
+    box-shadow: 0 0 1rem rgba(0,0,0,0.1) !important; /* Vurgu için gölge */
 }
