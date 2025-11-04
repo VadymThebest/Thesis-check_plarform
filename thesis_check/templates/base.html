@@ -12,18 +12,21 @@
 </head>
 <body>
     {% if user.is_authenticated %}
-    <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-    <span>Hello, {{ user.email }}</span>
-    <form method="post" action="{% url 'logout' %}" style="margin: 0;">
-      {% csrf_token %}
-      <button type="submit" style="background: none; border: none; color: blue; text-decoration: underline; cursor: pointer;">
-        Выйти
-      </button>
-     </form>
+    <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; padding: 10px;">
+        <span>Hello, {{ user.email }}</span>
+        <form method="post" action="{% url 'logout' %}" style="margin: 0;">
+            {% csrf_token %}
+            <button type="submit" style="background: none; border: none; color: blue; text-decoration: underline; cursor: pointer;">
+                Logout
+            </button>
+        </form>
     </div>
     {% else %}
-    <a href="{% url 'login' %}">login</a>
+    <div style="padding: 10px;">
+        <a href="{% url 'login' %}">Login</a>
+    </div>
     {% endif %}
+
     <main class="container">
         {% block content %}
         <!-- Default content (can be overridden by child templates) -->

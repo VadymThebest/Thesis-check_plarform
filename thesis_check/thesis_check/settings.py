@@ -15,6 +15,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'pgvector.django',
     'checking',
     'api',
     'users',
@@ -58,7 +59,7 @@ ROOT_URLCONF = 'thesis_check.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / "templates"],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -74,18 +75,24 @@ TEMPLATES = [
 WSGI_APPLICATION = 'thesis_check.wsgi.application'
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": "postgres",
+        "USER": "postgres",
+        "PASSWORD": "postgres",
+        "HOST": "localhost",
+        "PORT": "5432",
     }
 }
 LOGIN_URL = '/accounts/login/'
 LOGIN_REDIRECT_URL = '/index/'
 LOGOUT_REDIRECT_URL = '/accounts/login/'
 
-
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [BASE_DIR / "templates" / "assets"]
+STATICFILES_DIRS = [
+    BASE_DIR / "templates" / "assets",
+    BASE_DIR / "assets",
+]
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 MEDIA_URL = '/media/'

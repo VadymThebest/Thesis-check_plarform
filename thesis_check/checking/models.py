@@ -1,5 +1,6 @@
 from django.db import models
 from django.conf import settings
+from pgvector.django import VectorField
 
 class ThesisSubmission(models.Model):
     student = models.ForeignKey(
@@ -20,3 +21,11 @@ class ThesisSubmission(models.Model):
      if self.student and hasattr(self.student, "email"):
         return f"Thesis {self.id} by {self.student.email}"
      return f"Thesis {self.id} (без пользователя)"
+
+class Article(models.Model):
+    title = models.TextField(max_length=255)
+    content = models.TextField()
+    embedding = VectorField(dimensions=768)
+
+    def __str__(self):
+            return self.title
