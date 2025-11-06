@@ -5,3 +5,6 @@ thesis_check/pgvector
 
 **/migrations/
 **/migrations/*
+media/uploads/
+*.exe
+*.dll
