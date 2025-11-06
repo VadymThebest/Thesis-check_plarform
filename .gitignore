@@ -1,7 +1,4 @@
 /venv
-<<<<<<< HEAD
-.env
-=======
 thesis_check/pgvector
 # Игнорировать все __pycache__ папки и их содержимое
 **/__pycache__/

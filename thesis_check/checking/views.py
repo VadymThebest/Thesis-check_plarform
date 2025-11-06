@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import os
 from django.shortcuts import render, redirect
 from django.conf import settings
@@ -51,4 +50,3 @@ def check(request, id):
         return render(request, "check.html", {"error": "File not found."})
 
     return render(request, "check.html", {"submission": thesis})
->>>>>>> origin/backend_batman
