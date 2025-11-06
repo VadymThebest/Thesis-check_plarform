@@ -1,9 +1,0 @@
-pip install python-dotenv
-pip install django djangorestframework djangorestframework-simplejwt
-pip install psycopg2-binary
-pip install spacy
-python -m spacy download en_core_web_sm
-.\venv\Scripts\activate
-python manage.py runserver
-pip install scikit-learn
-pip install numpy pandas
