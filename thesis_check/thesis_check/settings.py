@@ -1,5 +1,7 @@
 import os
 from pathlib import Path
+from django.db.backends.signals import connection_created
+from django.dispatch import receiver
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -67,3 +69,8 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+@receiver(connection_created)
+def extend_postgres_with_vector(sender, connection, **kwargs):
+    if connection.vendor == 'postgresql':
+        with connection.cursor() as cursor:
+            cursor.execute('CREATE EXTENSION IF NOT EXISTS vector;')

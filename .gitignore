@@ -1,10 +1,45 @@
-/venv
-thesis_check/pgvector
-**/__pycache__/
-**/__pycache__/*
+# Virtual environments
+venv/
+.env/
+.env.bak/
 
+# Python cache
+**/__pycache__/
+**/*.py[cod]
+
+# Django migrations (opsiyonel: sadece otomatik üretilenler)
 **/migrations/
-**/migrations/*
+!**/migrations/__init__.py  # __init__.py dosyaları kalsın
+
+# Media and uploads
+media/
 media/uploads/
-*.exe
+
+# System & IDE files
+.vscode/
+.idea/
+*.log
+*.DS_Store
+
+# Compiled / temporary files
+*.so
 *.dll
+*.exe
+*.pyc
+*.pyo
+*.pyd
+*.db
+*.sqlite3
+
+# Node / JS builds (eğer frontend varsa)
+node_modules/
+build/
+dist/
+
+# Other project-specific folders
+thesis_check/pgvector/
+
+# Backup & temporary files
+*.bak
+*.swp
+*.tmp
