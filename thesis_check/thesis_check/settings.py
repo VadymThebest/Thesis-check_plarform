@@ -54,6 +54,12 @@ MIDDLEWARE = [
 
 AUTH_USER_MODEL = 'users.CustomUser'
 
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    'users.backends.EmailOrUsernameBackend',
+]
+
+
 ROOT_URLCONF = 'thesis_check.urls'
 
 TEMPLATES = [
@@ -84,7 +90,7 @@ DATABASES = {
         "PORT": "5432",
     }
 }
-LOGIN_URL = '/accounts/login/'
+LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/index/'
 LOGOUT_REDIRECT_URL = '/accounts/login/'
 

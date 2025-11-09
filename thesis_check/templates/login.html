@@ -12,7 +12,7 @@
         
         <form method="post">
             {% csrf_token %} <div class="mb-3">
-                <label for="{{ form.username.id_for_label }}" class="form-label">Username / Student ID</label>
+                <label for="{{ form.username.id_for_label }}" class="form-label">Username / Email</label>
                 {{ form.username }} 
             </div>
             <div class="mb-3">
