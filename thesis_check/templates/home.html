@@ -1,0 +1,32 @@
+{% extends "base.html" %} 
+
+{% block content %}
+<div class="p-5 mb-4 bg-light rounded-3">
+    <div class="container-fluid py-5">
+        <h1 class="display-5 fw-bold">Welcome to the Thesis Control System</h1>
+        <p class="col-md-8 fs-4">This platform allows you to upload your thesis drafts, track your progress, and receive feedback from your advisor.</p>
+        <a class="btn btn-primary btn-lg" href="{% url 'login' %}" role="button">Log in to the System</a>
+    </div>
+</div>
+
+<div class="row align-items-md-stretch">
+    <div class="col-md-4">
+        <div class="h-100 p-5 text-white bg-dark rounded-3">
+            <h2>Quick Upload</h2>
+            <p>Upload your thesis draft or sections in seconds and submit them to your advisor.</p>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="h-100 p-5 bg-light border rounded-3">
+            <h2>Real-Time Tracking</h2>
+            <p>Instantly monitor your thesis status and review the grades and notes you receive.</p>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="h-100 p-5 text-white bg-primary rounded-3">
+            <h2>Detailed Feedback</h2>
+            <p>Receive structured and detailed feedback from your supervisor to improve your work.</p>
+        </div>
+    </div>
+</div>
+{% endblock content %}

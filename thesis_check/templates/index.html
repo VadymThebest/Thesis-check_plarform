@@ -10,6 +10,13 @@
             <div class="card-body p-4 p-md-5 text-center">
                 
                 <h1 class="h3 mb-3 fw-light">Thesis Check Platform</h1>
+                {% if user.is_authenticated %}
+                <p class="fw-bold text-primary text-center mb-4" style="font-size: 1.25rem;">
+                 Logged in as: {{ user.username }}{% if user.role %} ({{ user.role|title }}){% endif %}
+                </p>
+                {% endif %}
+
+
                 <p class="text-muted mb-4">
                     Upload your thesis for plagiarism, grammar, and format checking.
                 </p>

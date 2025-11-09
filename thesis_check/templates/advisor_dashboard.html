@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1 class="display-4 mb-4">{{ title }}</h1>
+
+<p class="alert alert-info">Welcome, Advisor! Below are the theses currently assigned to you for review.</p>
+
+<h2 class="h4 mb-3">Assigned Theses ({{ theses.count }})</h2>
+
+{% if theses %}
+<div class="table-responsive">
+    <table class="table table-striped table-hover align-middle">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Student</th>
+                <th>Status</th>
+                <th>Last Submission</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for thesis in theses %}
+            <tr>
+                <td>{{ thesis.title }}</td>
+                <td>{{ thesis.student.get_full_name|default:thesis.student.username }}</td>
+                <td><span class="badge bg-primary">{{ thesis.get_status_display }}</span></td>
+                <td>{{ thesis.submission_date|date:"M d, Y" }}</td>
+                <td>
+                    <a href="#" class="btn btn-sm btn-outline-primary">Review Thesis</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="alert alert-warning" role="alert">
+    You do not currently have any theses assigned for review.
+</div>
+{% endif %}
+
+{% endblock content %}

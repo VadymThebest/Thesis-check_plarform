@@ -1,6 +1,31 @@
-<h2>Entrance</h2>
-<form method="post">
-  {% csrf_token %}
-  {{ form.as_p }}
-  <button type="submit">Enter</button>
-</form>
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <h2 class="text-center mb-4">System Login</h2>
+        {% if form.errors %}
+            <div class="alert alert-danger">
+                Your username and password did not match. Please try again.
+            </div>
+        {% endif %}
+        
+        <form method="post">
+            {% csrf_token %} <div class="mb-3">
+                <label for="{{ form.username.id_for_label }}" class="form-label">Username / Student ID</label>
+                {{ form.username }} 
+            </div>
+            <div class="mb-3">
+                <label for="{{ form.password.id_for_label }}" class="form-label">Password</label>
+                {{ form.password }}
+            </div>
+
+            <div class="d-grid gap-2">
+                <button type="submit" class="btn btn-primary">Log In</button>
+            </div>
+        </form>
+        <p class="text-center mt-3">Not registered yet? <a href="{% url 'site_register' %}">Create an account</a></p>
+        <p class="text-center mt-3"><a href="#">Forgot Password?</a></p>    
+    </div>
+</div>
+{% endblock content %}

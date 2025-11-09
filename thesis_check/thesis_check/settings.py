@@ -77,9 +77,9 @@ WSGI_APPLICATION = 'thesis_check.wsgi.application'
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": "postgres",
+        "NAME": "thesis_db",
         "USER": "postgres",
-        "PASSWORD": "postgres",
+        "PASSWORD": "vadim_vadim",
         "HOST": "localhost",
         "PORT": "5432",
     }

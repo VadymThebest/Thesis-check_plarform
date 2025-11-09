@@ -6,10 +6,62 @@ from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import generics
-
+from users.models import CustomUser
+from users.forms import CustomUserCreationForm
 from .models import ThesisSubmission
 from api.serializers import ThesisSubmissionSerializer
 from api.nlp import run_plagiarism_and_grammar_check
+from users.serializers import RegisterSerializer
+from django.contrib import messages
+from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth import authenticate, login
+
+
+class RegisterView(generics.CreateAPIView):
+    queryset = CustomUser.objects.all()
+    serializer_class = RegisterSerializer
+
+# ✅ Static pages
+def home_view(request):
+    return render(request, "home.html")
+
+def about_view(request):
+    return render(request, "about.html")
+
+def contact_view(request):
+    return render(request, "contact.html")
+
+
+# ✅ Auth views
+def login_view(request):
+    if request.method == 'POST':
+        form = AuthenticationForm(request, data=request.POST)
+        if form.is_valid():
+            user = form.get_user()
+            login(request, user)
+            messages.success(request, f"👋 Welcome back, {user.username}!")
+            return redirect('index')  
+        else:
+            messages.error(request, "Invalid username or password.")
+    else:
+        form = AuthenticationForm()
+    return render(request, 'login.html', {'form': form})
+
+
+def register_view(request):
+    if request.method == 'POST':
+        form = CustomUserCreationForm(request.POST)
+        if form.is_valid():
+            user = form.save(commit=False)
+            if user.role == 'admin':
+             user.is_staff = True
+             user.is_superuser = True
+             user = form.save()
+            messages.success(request, "🎉 Registration was successful, welcome! " + user.username)
+            return redirect('index')  
+    else:
+        form = CustomUserCreationForm()
+    return render(request, 'register.html', {'form': form})
 
 
 # ✅ API view for uploading theses (token-protected)
@@ -19,9 +71,7 @@ class UploadThesisView(generics.CreateAPIView):
     serializer_class = ThesisSubmissionSerializer
 
     def perform_create(self, serializer):
-        # Save record with current authenticated user
         serializer.save(student=self.request.user, status="processing")
-
 
 # ✅ Web upload page (login required)
 @login_required
@@ -61,6 +111,28 @@ def index(request):
         return redirect(reverse("check", kwargs={"id": thesis.id}))
 
     return render(request, "index.html")
+# ✅ Advisor dashboard
+@login_required
+def advisor_dashboard_view(request):
+    if request.user.role != 'advisor':
+        return redirect('index')
+    theses = ThesisSubmission.objects.filter(advisor=request.user).order_by('-submission_date')
+    return render(request, 'advisor_dashboard.html', {
+        'title': 'Advisor Dashboard',
+        'theses': theses,
+    })
+
+
+# ✅ Student dashboard
+@login_required
+def student_dashboard_view(request):
+    if request.user.role != 'student':
+        return redirect('index')
+    theses = ThesisSubmission.objects.filter(student=request.user).order_by('-updated_at')
+    return render(request, 'student_dashboard.html', {
+        'title': 'My Thesis Submissions',
+        'theses': theses,
+    })
 
 
 # ✅ Results view for processed thesis
@@ -71,8 +143,4 @@ def check(request, id):
     except ThesisSubmission.DoesNotExist:
         return render(request, "check.html", {"error": "File not found."})
 
-    return render(
-        request,
-        "check.html",
-        {"submission": thesis},
-    )
+    return render(request, "check.html", {"submission": thesis})
