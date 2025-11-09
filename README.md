@@ -48,6 +48,15 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 
 # Install dependencies
 pip install -r requirements.txt
+pip install -U spacy==3.7.1
+pip install https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.7.1/en_core_web_sm-3.7.1-py3-none-any.whl
+
+# Create database
+sudo -u postgres psql
+CREATE DATABASE mydatabase;
+CREATE USER myuser WITH PASSWORD 'mypassword';
+CREATE EXTENSION IF NOT EXISTS vector;
+\q
 
 # Apply database migrations
 python manage.py migrate
