@@ -7,6 +7,16 @@ from rest_framework import generics
 from users.serializers import RegisterSerializer
 from django.contrib.auth.forms import PasswordResetForm
 from django.contrib.auth.models import User
+from django.urls import reverse
+from django.template.loader import render_to_string
+from django.core.mail import send_mail
+from django.conf import settings
+from django.contrib.auth.tokens import default_token_generator
+from django.shortcuts import get_object_or_404
+from django.contrib.auth import update_session_auth_hash
+
+from users.forms import PasswordResetRequestForm, CustomSetPasswordForm
+
 
 # 🔹 Public pages
 def home_view(request):
