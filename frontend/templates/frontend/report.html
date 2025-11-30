@@ -1,0 +1,114 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Your Thesis Analysis Report</title>
+    <link rel="stylesheet" href="{% static 'frontend/css/style.css' %}">
+</head>
+<body class="page-bg">
+
+    <!-- NAVBAR -->
+    <div class="navbar">
+        <div class="logo">THESIS CHECK</div>
+        <div class="nav-links">
+            <a href="/">HOME</a>
+            <a href="/about/">ABOUT</a>
+            <a href="/upload/">UPLOAD THESIS</a>
+            <a href="/contact/">CONTACT US</a>
+            <a href="#">LOG OUT</a>
+        </div>
+    </div>
+
+    <main class="report-main">
+        <!-- Başlık -->
+        <section class="report-header">
+            <h1 class="page-title">Your Thesis Analysis Report</h1>
+            <p class="page-subtitle">
+                Plagiarism, grammar and citation results for your uploaded thesis.
+            </p>
+        </section>
+
+        <!-- 3 büyük kart -->
+        <section class="report-metrics">
+            <!-- Plagiarism -->
+            <div class="report-card">
+                <h2 class="report-card-title">Plagiarism</h2>
+
+                <div class="report-value-wrapper">
+                    <div class="report-value-circle">
+                        <span class="report-value">{{ plagiarism }}%</span>
+                    </div>
+                    <span class="report-badge">{{ plagiarism_level }}</span>
+                </div>
+
+                <p class="report-label">Similarity</p>
+
+                <div class="report-sources">
+                    <p class="sources-title">Similar sources</p>
+                    <ul>
+                        {% for src in similar_sources %}
+                            <li>{{ src }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Grammar -->
+            <div class="report-card">
+                <h2 class="report-card-title">Grammar</h2>
+
+                <div class="report-value-wrapper">
+                    <div class="report-value-circle">
+                        <span class="report-value">{{ grammar_issues }}</span>
+                    </div>
+                    <span class="report-badge">Minor Issues</span>
+                </div>
+
+                <p class="report-label">Issues detected</p>
+                <p class="report-description">
+                    Similar issues and minor errors were found in your thesis.
+                </p>
+            </div>
+
+            <!-- Citations -->
+            <div class="report-card">
+                <h2 class="report-card-title">Citations</h2>
+
+                <div class="report-value-wrapper">
+                    <div class="report-value-circle">
+                        <span class="report-value">{{ citation_accuracy }}%</span>
+                    </div>
+                    <span class="report-badge">Accuracy</span>
+                </div>
+
+                <p class="report-description">
+                    Convert remaining citations to APA and fix one broken reference.
+                </p>
+            </div>
+        </section>
+
+        <!-- Detaylar -->
+        <section class="report-details">
+            <h2 class="report-details-title">
+                Details {{ details|length }} problems found
+            </h2>
+
+            <ul class="report-details-list">
+                {% for color, text in details %}
+                    <li class="report-detail-item">
+                        <span class="detail-dot {{ color }}"></span>
+                        <span class="detail-text">{{ text }}</span>
+                    </li>
+                {% endfor %}
+            </ul>
+        </section>
+
+        <!-- Download butonu -->
+        <div class="report-download">
+            <a href="#" class="report-download-btn">Download Report</a>
+        </div>
+    </main>
+
+</body>
+</html>

@@ -1,0 +1,994 @@
+/* GENEL RESET */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* SAYFA GENELİ */
+body {
+    min-height: 100vh;
+    background: #021633; /* koyu lacivert */
+    color: #f8f1e4;      /* açık krem */
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+/* NAVBAR */
+.navbar {
+    padding: 24px 64px 0 64px;
+}
+
+.nav-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.nav-left,
+.nav-right {
+    flex: 1;
+}
+
+.nav-center {
+    display: flex;
+    gap: 40px;
+    justify-content: center;
+    flex: 1;
+}
+
+.nav-center a,
+.login-link,
+.brand {
+    text-decoration: none;
+    letter-spacing: 0.12em;
+    font-size: 14px;
+    color: #f8f1e4;
+}
+
+.brand {
+    font-weight: 600;
+}
+
+/* HERO BÖLÜMÜ */
+.hero {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 80px 64px 120px 64px;
+}
+
+.hero-inner {
+    text-align: center;
+    max-width: 900px;
+}
+
+/* Başlık serif font havası */
+.hero-title {
+    font-family: "Georgia", "Times New Roman", serif;
+    font-size: 72px;
+    line-height: 1.1;
+    color: #f8f1e4;
+    margin-bottom: 32px;
+}
+
+/* Alt metin */
+.hero-subtitle {
+    font-family: "Georgia", "Times New Roman", serif;
+    font-size: 24px;
+    line-height: 1.6;
+    color: #d8d4c8;
+    margin-bottom: 48px;
+}
+
+/* Buton */
+.hero-button {
+    padding: 18px 48px;
+    border-radius: 6px;
+    border: none;
+    font-size: 18px;
+    font-weight: 500;
+    cursor: pointer;
+    background-color: #d5a544; /* gold */
+    color: #021633;
+}
+/* ABOUT SAYFASI */
+
+.about {
+    padding: 80px 64px 120px 64px;
+    display: flex;
+    justify-content: center;
+}
+
+.about-inner {
+    max-width: 1100px;
+    text-align: center;
+    margin: 0 auto;
+}
+
+.about-title {
+    font-family: "Georgia", "Times New Roman", serif;
+    font-size: 48px;
+    color: #f8f1e4;
+    margin-bottom: 24px;
+}
+
+.about-text {
+    font-family: "Georgia", "Times New Roman", serif;
+    font-size: 20px;
+    line-height: 1.6;
+    color: #d8d4c8;
+    margin-bottom: 60px;
+}
+
+/* Kart alanı */
+.about-cards {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 32px;
+}
+
+/* Kartın kendisi */
+.about-card {
+    background: linear-gradient(to bottom, #032248, #0850a3);
+    border-radius: 18px;
+    padding: 40px 28px 32px 28px;
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
+    color: #f8f1e4;
+}
+
+/* Kart içindeki ikon */
+.about-card-icon {
+    font-size: 40px;
+    margin-bottom: 24px;
+}
+
+/* Kart başlığı */
+.about-card-title {
+    font-family: "Georgia", "Times New Roman", serif;
+    font-size: 24px;
+    line-height: 1.4;
+    margin-bottom: 16px;
+}
+
+/* Kart açıklaması */
+.about-card-text {
+    font-size: 16px;
+    line-height: 1.6;
+    color: #d8d4c8;
+}
+/* CONTACT SAYFASI */
+
+.contact {
+    padding: 80px 64px 120px 64px;
+    display: flex;
+    justify-content: center;
+}
+
+.contact-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.contact-title {
+    font-size: 48px;
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 24px;
+}
+
+.contact-text {
+    font-size: 22px;
+    line-height: 1.6;
+    color: #e5e7eb;
+    margin-bottom: 60px;
+}
+
+/* Kart alanı */
+.contact-cards {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 32px;
+}
+
+/* Kartın kendisi */
+.contact-card {
+    background: linear-gradient(to bottom, #05254a, #0a57a3);
+    border-radius: 18px;
+    padding: 40px 28px 32px 28px;
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
+    color: #f9fafb;
+}
+
+/* İkon */
+.contact-card-icon {
+    font-size: 40px;
+    margin-bottom: 24px;
+}
+
+/* Başlık */
+.contact-card-title {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 16px;
+}
+
+/* Yazı */
+.contact-card-text {
+    font-size: 16px;
+    line-height: 1.6;
+    color: #e5e7eb;
+}
+/* LOGIN SAYFASI */
+
+.login-section {
+    padding: 80px 16px 120px 16px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+.login-card {
+    width: 520px;
+    max-width: 100%;
+    margin-top: 40px;
+    border-radius: 24px;
+    border: 1px solid #d5a544;
+    padding: 48px 56px 40px 56px;
+    background: rgba(2, 22, 51, 0.85);
+    color: #f8f1e4;
+}
+
+.login-title {
+    font-family: "Georgia", "Times New Roman", serif;
+    font-size: 36px;
+    text-align: center;
+    margin-bottom: 16px;
+}
+
+.login-subtitle {
+    text-align: center;
+    font-size: 14px;
+    color: #d1d5db;
+    margin-bottom: 32px;
+}
+
+.login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+/* input alanları */
+.login-field label {
+    display: block;
+    font-size: 14px;
+    margin-bottom: 8px;
+}
+
+.login-field input {
+    width: 100%;
+    padding: 12px 16px;
+    border-radius: 999px;
+    border: 1px solid #d1d5db;
+    background: transparent;
+    color: #f9fafb;
+    outline: none;
+}
+
+.login-field input:focus {
+    border-color: #d5a544;
+}
+
+/* Forgot password */
+.login-forgot {
+    margin-top: 8px;
+    text-align: right;
+}
+
+.login-forgot a {
+    font-size: 12px;
+    color: #f8f1e4;
+    text-decoration: none;
+}
+
+/* Buton */
+.login-button {
+    margin-top: 8px;
+    width: 100%;
+    padding: 14px 0;
+    border-radius: 999px;
+    border: none;
+    background: #d5a544;
+    color: #021633;
+    font-size: 18px;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+/* Alt yazı */
+.login-bottom-text {
+    margin-top: 16px;
+    font-size: 13px;
+    text-align: center;
+    color: #e5e7eb;
+}
+
+.login-signup-link {
+    color: #d5a544;
+    text-decoration: none;
+}
+/* SIGNUP SAYFASI */
+
+.signup-title {
+    text-align: center;
+    font-size: 32px;
+    font-weight: 600;
+    color: #f9fafb;
+    margin-bottom: 8px;
+}
+
+.signup-subtitle {
+    text-align: center;
+    font-size: 14px;
+    color: #d1d5db;
+    margin-bottom: 32px;
+}
+/* DASHBOARD / UPLOAD THESIS SAYFASI */
+
+.dashboard {
+    padding: 80px 64px 120px 64px;
+}
+
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 32px;
+}
+
+.dashboard-top {
+    margin-bottom: 48px;
+}
+
+.dashboard-card {
+    border-radius: 18px;
+    border: 1px solid #e5e7eb;
+    padding: 40px 32px;
+    background: #142448;
+    color: #f9fafb;
+}
+
+/* Üstteki aksiyon kartları */
+.action-card {
+    text-align: center;
+}
+
+.dashboard-icon {
+    font-size: 40px;
+    margin-bottom: 24px;
+}
+
+.dashboard-title {
+    font-family: "Georgia", "Times New Roman", serif;
+    font-size: 24px;
+    line-height: 1.4;
+}
+
+/* Alttaki doküman kartları */
+.doc-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.doc-title {
+    font-family: "Georgia", "Times New Roman", serif;
+    font-size: 22px;
+    margin-bottom: 16px;
+}
+
+.doc-meta {
+    font-size: 14px;
+    color: #e5e7eb;
+    margin-bottom: 24px;
+}
+
+.doc-actions {
+    display: flex;
+    justify-content: flex-start;
+    gap: 24px;
+    font-size: 14px;
+}
+
+.doc-actions a {
+    color: #f9fafb;
+    text-decoration: none;
+}
+/* UPLOAD YOUR THESIS SAYFASI */
+
+.upload-section {
+    padding: 80px 64px 120px 64px;
+    display: flex;
+    justify-content: center;
+}
+
+.upload-inner {
+    max-width: 900px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.upload-title {
+    font-family: "Georgia", "Times New Roman", serif;
+    font-size: 56px;
+    color: #f8f1e4;
+    margin-bottom: 16px;
+}
+
+.upload-subtitle {
+    font-size: 18px;
+    color: #d1d5db;
+    margin-bottom: 48px;
+}
+
+/* Drag & Drop kutusu */
+.upload-dropzone {
+    border: 2px dashed #e5e7eb;
+    border-radius: 18px;
+    padding: 80px 40px;
+    margin-bottom: 48px;
+    background: rgba(2, 22, 51, 0.8);
+}
+
+.upload-cloud {
+    font-size: 56px;
+    margin-bottom: 24px;
+}
+
+.upload-drop-main {
+    font-size: 18px;
+    color: #f9fafb;
+    margin-bottom: 8px;
+}
+
+.upload-drop-sub {
+    font-size: 14px;
+    color: #9ca3af;
+}
+
+/* Alt buton */
+.upload-button {
+    padding: 16px 48px;
+    border-radius: 999px;
+    border: none;
+    background: #d5a544;
+    color: #021633;
+    font-size: 18px;
+    font-weight: 500;
+    cursor: pointer;
+}
+.dashboard-card-link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+}
+/* === REPORT PAGE (10. SAYFA) === */
+
+.report-main {
+    max-width: 1100px;
+    margin: 80px auto 80px;
+    padding: 0 24px 80px;
+    color: #f4f4ff;
+}
+
+.report-header {
+    text-align: center;
+    margin-bottom: 48px;
+}
+
+.report-metrics {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 24px;
+    margin-bottom: 40px;
+}
+
+.report-card {
+    background: linear-gradient(180deg, #132349, #0d1834);
+    border-radius: 22px;
+    padding: 24px 24px 28px;
+    box-shadow: 0 18px 45px rgba(0, 0, 0, 0.45);
+}
+
+.report-card-title {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 18px;
+}
+
+.report-value-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 18px;
+}
+
+.report-value-circle {
+    width: 82px;
+    height: 82px;
+    border-radius: 50%;
+    border: 3px solid #4b73ff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.report-value {
+    font-size: 28px;
+    font-weight: 700;
+}
+
+.report-badge {
+    display: inline-block;
+    background: #243563;
+    border-radius: 999px;
+    padding: 6px 16px;
+    font-size: 13px;
+}
+
+.report-label {
+    font-size: 13px;
+    color: #c3c8de;
+    margin-bottom: 6px;
+}
+
+.report-sources {
+    margin-top: 4px;
+}
+
+.sources-title {
+    font-size: 13px;
+    color: #c3c8de;
+    margin-bottom: 4px;
+}
+
+.report-sources ul {
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+    font-size: 13px;
+    color: #d8ddf3;
+}
+
+.report-sources li + li {
+    margin-top: 2px;
+}
+
+.report-description {
+    font-size: 13px;
+    color: #c3c8de;
+}
+
+.report-details {
+    margin-top: 24px;
+}
+
+.report-details-title {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 12px;
+}
+
+.report-details-list {
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+}
+
+.report-detail-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 6px;
+    font-size: 14px;
+    color: #e3e7ff;
+}
+
+.detail-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    margin-top: 6px;
+}
+
+/* renkler */
+.detail-dot.blue { background: #4b73ff; }
+.detail-dot.red { background: #ff5c5c; }
+.detail-dot.yellow { background: #f3c54b; }
+.detail-dot.purple { background: #ad7bff; }
+
+.report-download {
+    text-align: center;
+    margin-top: 32px;
+}
+
+.report-download-btn {
+    display: inline-block;
+    background: #d4a448;
+    color: #11182b;
+    padding: 14px 40px;
+    border-radius: 999px;
+    font-weight: 600;
+    text-decoration: none;
+    font-size: 15px;
+}
+
+.report-download-btn:hover {
+    opacity: 0.9;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+    .report-metrics {
+        grid-template-columns: 1fr;
+    }
+}
+/* ==== MY REPORTS PAGE ==== */
+
+/* My Reports tablosu */
+.reports-table-wrapper {
+    max-width: 1100px;
+    margin: 48px auto 80px;
+    border-radius: 24px;
+    background: linear-gradient(145deg, #101f3b, #0b1730);
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.5);
+    padding: 32px 40px;
+}
+
+.reports-table {
+    width: 100%;
+    border-collapse: collapse;
+    color: #f7f4ff;
+    font-size: 14px;
+}
+
+.reports-table thead th {
+    text-align: left;
+    padding: 12px 8px;
+    font-weight: 600;
+    color: #a8b3d6;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.reports-table tbody td {
+    padding: 14px 8px;
+}
+
+.reports-table tbody tr:nth-child(2) td {
+    border-top: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.reports-table tbody tr:nth-child(3) td {
+    border-top: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.reports-table-footer td {
+    padding-top: 24px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    color: #c3cbe4;
+    font-size: 13px;
+}
+/* Checks History başlığı (ortalanmış) */
+.page-title-centered {
+    margin-top: 80px;
+    text-align: center;
+    font-size: 32px;
+    color: #f8f2ff;
+    letter-spacing: 0.03em;
+}
+
+.page-subtitle-centered {
+    margin-top: 12px;
+    text-align: center;
+    color: #c6cbe5;
+    font-size: 16px;
+}
+
+/* Checks History tablosu aksiyon sütunu */
+.checks-table .checks-action-col,
+.checks-table .checks-action-cell {
+    text-align: right;
+}
+
+.checks-view-link {
+    font-size: 13px;
+    font-weight: 500;
+    color: #f7f4ff;
+    text-decoration: underline;
+    cursor: pointer;
+}
+/* ============================
+   ADMIN DASHBOARD
+   ============================ */
+
+.admin-page {
+    display: flex;
+    max-width: 1200px;
+    margin: 40px auto 80px;
+    gap: 0;
+}
+
+/* Sol sidebar */
+.admin-sidebar {
+    width: 260px;
+    border-right: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 32px 24px;
+    display: flex;
+    flex-direction: column;
+}
+
+.admin-sidebar-title {
+    font-size: 24px;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    color: #f5f7ff;
+}
+
+.admin-menu {
+    margin-top: 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.admin-menu-link {
+    display: block;
+    padding: 12px 18px;
+    border-radius: 16px;
+    font-size: 18px;
+    color: #e3e9ff;
+    opacity: 0.7;
+}
+
+.admin-menu-link:hover {
+    opacity: 1;
+}
+
+.admin-menu-link.active {
+    background: #172338;
+    opacity: 1;
+}
+
+/* Sağ içerik */
+.admin-main {
+    flex: 1;
+    padding: 32px 40px;
+}
+
+.admin-main-title {
+    font-size: 32px;
+    color: #f5f7ff;
+    margin-bottom: 24px;
+}
+
+/* Üst kartlar */
+.admin-cards-row {
+    display: flex;
+    gap: 24px;
+    margin-bottom: 32px;
+}
+
+.admin-stat-card {
+    flex: 1;
+    background: linear-gradient(145deg, #101f3b, #0b1730);
+    border-radius: 20px;
+    padding: 24px 28px;
+    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.5);
+}
+
+.admin-stat-label {
+    font-size: 16px;
+    color: #a8b3d6;
+    margin-bottom: 12px;
+}
+
+.admin-stat-value {
+    font-size: 32px;
+    font-weight: 600;
+    color: #f7f4ff;
+}
+
+/* Recent Users kısmı */
+.admin-section-title {
+    font-size: 20px;
+    color: #f5f7ff;
+    margin-bottom: 16px;
+}
+
+.admin-recent-users .reports-table-wrapper {
+    margin-top: 0;
+}
+/* ---------- USER DASHBOARD (14. SAYFA) ---------- */
+
+.analytics-main {
+    max-width: 1100px;
+    margin: 80px auto 96px;
+}
+
+/* Sayfa başlığı */
+.analytics-title {
+    font-size: 32px;
+    font-weight: 700;
+    color: #f7f4ff;
+    margin-bottom: 32px;
+}
+
+/* Üstteki üç kart (Total Checks / Average Plagiarism / Last Report Score) */
+.analytics-kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 24px;
+    margin-bottom: 32px;
+}
+
+.analytics-card {
+    background: radial-gradient(circle at top left, #1f2a4a, #141d36);
+    border-radius: 24px;
+    padding: 24px 28px;
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.55);
+}
+
+.analytics-kpi-label {
+    font-size: 14px;
+    color: #a8b3d6;
+    margin-bottom: 8px;
+}
+
+.analytics-kpi-value {
+    font-size: 28px;
+    font-weight: 700;
+    color: #ffffff;
+}
+
+/* Çizgi grafiği kartı */
+.analytics-chart {
+    margin-top: 24px;
+    margin-bottom: 32px;
+    background: radial-gradient(circle at top left, #1f2a4a, #141d36);
+    border-radius: 24px;
+    padding: 24px 32px 28px;
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.55);
+}
+
+.analytics-chart-title {
+    font-size: 14px;
+    color: #a8b3d6;
+    margin-bottom: 8px;
+}
+
+.analytics-chart-subtitle {
+    font-size: 13px;
+    color: #7f8bb5;
+    margin-bottom: 16px;
+}
+
+/* SVG çizgi */
+.analytics-chart-svg {
+    display: block;
+    width: 100%;
+    height: 220px;
+}
+
+.analytics-chart-line {
+    fill: none;              /* siyah büyük dolgu GİTTİ */
+    stroke: #4da3ff;
+    stroke-width: 3;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.analytics-chart-point {
+    fill: #4da3ff;
+}
+
+/* Gün isimleri */
+.analytics-chart-days {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 8px;
+    font-size: 12px;
+    color: #a8b3d6;
+}
+
+/* Recent Checks tablosu */
+.analytics-table-wrapper {
+    background: radial-gradient(circle at top left, #1f2a4a, #141d36);
+    border-radius: 24px;
+    padding: 24px 32px 28px;
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.55);
+    margin-top: 24px;
+}
+
+.analytics-table-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #f7f4ff;
+    margin-bottom: 16px;
+}
+
+.analytics-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+    color: #f7f4ff;
+}
+
+.analytics-table thead th {
+    text-align: left;
+    padding: 10px 6px;
+    font-weight: 600;
+    color: #a8b3d6;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.analytics-table tbody td {
+    padding: 10px 6px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+/* Küçük ekran (senin pencereyi yarıya indirince olan görünüm) */
+@media (max-width: 980px) {
+    .analytics-main {
+        margin: 32px 16px 64px;
+    }
+
+    .analytics-kpi-grid {
+        grid-template-columns: 1fr;
+    }
+    .analytics-kpi-grid--top {
+    margin-bottom: 32px;
+}
+
+
+    .analytics-chart,
+    .analytics-table-wrapper {
+        padding: 20px 18px 24px;
+    }
+}
+/* ===== Dashboard Top Metric Cards ===== */
+
+.top-metrics {
+    display: flex;
+    gap: 24px;
+    margin: 32px auto;
+    max-width: 1100px;
+}
+
+.metric-card {
+    flex: 1;
+    background: linear-gradient(145deg, #102040, #0b1730);
+    padding: 24px;
+    border-radius: 20px;
+    text-align: center;
+    color: #fff;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+}
+
+.metric-card h3 {
+    font-size: 16px;
+    color: #a6b3d9;
+    margin-bottom: 12px;
+}
+
+.metric-value {
+    font-size: 32px;
+    font-weight: 600;
+    color: #ffffff;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+    .top-metrics {
+        flex-direction: column;
+    }
+}

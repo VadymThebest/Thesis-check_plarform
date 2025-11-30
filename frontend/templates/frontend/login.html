@@ -1,0 +1,40 @@
+{% extends 'frontend/base.html' %}
+
+{% block title %}Log In – Thesis Check{% endblock %}
+
+{% block content %}
+<section class="login-section">
+    <div class="login-card">
+        <h1 class="login-title">Log in to your<br>account</h1>
+
+        <p class="login-subtitle">
+            Enter your credentials to access your account.
+        </p>
+
+        <form class="login-form">
+            <div class="login-field">
+                <label for="email">Email</label>
+                <input id="email" type="email" placeholder="">
+            </div>
+
+            <div class="login-field">
+                <label for="password">Password</label>
+                <input id="password" type="password" placeholder="">
+                <div class="login-forgot">
+                    <a href="#">Forgot password?</a>
+                </div>
+            </div>
+
+            <button type="submit" class="login-button">
+                Log in
+            </button>
+
+            <p class="login-bottom-text">
+    Don’t have an account?
+    <a href="{% url 'signup' %}" class="login-signup-link">Sign up</a>
+           </p>
+
+        </form>
+    </div>
+</section>
+{% endblock %}

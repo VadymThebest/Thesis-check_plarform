@@ -1,0 +1,92 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <title>Admin Dashboard – Thesis Check</title>
+    <link rel="stylesheet" href="{% static 'frontend/css/style.css' %}">
+</head>
+<body class="page-bg">
+
+    <!-- NAVBAR -->
+    <div class="navbar">
+        <div class="logo">THESIS CHECK</div>
+        <div class="nav-links">
+            <a href="/">HOME</a>
+            <a href="/about/">ABOUT</a>
+            <a href="/upload-thesis/">UPLOAD THESIS</a>
+            <a href="/contact-us/">CONTACT US</a>
+            <a href="/login/">LOG IN</a>
+        </div>
+    </div>
+
+    <!-- ADMIN LAYOUT -->
+    <div class="admin-page">
+
+        <!-- SOL SİDEBAR -->
+        <aside class="admin-sidebar">
+            <div class="admin-sidebar-title">DASHBOARD</div>
+
+            <nav class="admin-menu">
+                <a href="#" class="admin-menu-link active">Overview</a>
+                <a href="#" class="admin-menu-link">Users</a>
+                <a href="#" class="admin-menu-link">Theses</a>
+                <a href="#" class="admin-menu-link">Settings</a>
+            </nav>
+        </aside>
+
+        <!-- SAĞ İÇERİK -->
+        <main class="admin-main">
+            <h1 class="admin-main-title">Admin Dashboard</h1>
+
+            <!-- Üst istatistik kartları -->
+            <div class="admin-cards-row">
+                <div class="admin-stat-card">
+                    <div class="admin-stat-label">Total Users</div>
+                    <div class="admin-stat-value">{{ total_users }}</div>
+                </div>
+
+                <div class="admin-stat-card">
+                    <div class="admin-stat-label">Total Theses</div>
+                    <div class="admin-stat-value">{{ total_theses }}</div>
+                </div>
+
+                <div class="admin-stat-card">
+                    <div class="admin-stat-label">System Load</div>
+                    <div class="admin-stat-value">{{ system_load }}%</div>
+                </div>
+            </div>
+
+            <!-- Recent Users -->
+            <section class="admin-recent-users">
+                <h2 class="admin-section-title">Recent Users</h2>
+
+                <div class="reports-table-wrapper">
+                    <table class="reports-table">
+                        <thead>
+                            <tr>
+                                <th>User</th>
+                                <th>Email</th>
+                                <th>Theses</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for user in recent_users %}
+                            <tr>
+                                <td>{{ user.name }}</td>
+                                <td>{{ user.email }}</td>
+                                <td>{{ user.theses }}</td>
+                                <td>{{ user.status }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+
+</body>
+</html>

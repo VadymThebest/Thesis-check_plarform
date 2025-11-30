@@ -1,0 +1,53 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Checks History – Thesis Check</title>
+    <link rel="stylesheet" href="{% static 'frontend/css/style.css' %}">
+</head>
+<body class="page-bg">
+
+    <div class="navbar">
+        <div class="logo">THESIS CHECK</div>
+        <div class="nav-links">
+            <a href="/">HOME</a>
+            <a href="{% url 'about' %}">ABOUT</a>
+            <a href="{% url 'upload_thesis' %}">UPLOAD THESIS</a>
+            <a href="{% url 'contact' %}">CONTACT US</a>
+            <a href="{% url 'login' %}">LOG IN</a>
+        </div>
+    </div>
+
+    <h1 class="page-title-centered">Checks History</h1>
+    <p class="page-subtitle-centered">
+        Review and manage your previous thesis checks.
+    </p>
+
+    <div class="reports-table-wrapper">
+        <table class="reports-table checks-table">
+            <thead>
+                <tr>
+                    <th>File Name</th>
+                    <th>Date</th>
+                    <th>Status</th>
+                    <th class="checks-action-col">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for c in checks %}
+                <tr>
+                    <td>{{ c.file_name }}</td>
+                    <td>{{ c.date }}</td>
+                    <td>{{ c.status }}</td>
+                    <td class="checks-action-cell">
+                        <a href="#" class="checks-view-link">View</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+</body>
+</html>

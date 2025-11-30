@@ -1,0 +1,25 @@
+{% extends 'frontend/base_dashboard.html' %}
+
+{% block title %}Check for AI – Thesis Check{% endblock %}
+
+{% block content %}
+<section class="upload-section">
+    <div class="upload-inner">
+        <h1 class="upload-title">Check for AI</h1>
+
+        <p class="upload-subtitle">
+            Upload a document to check for AI content.
+        </p>
+
+        <div class="upload-dropzone">
+            <div class="upload-cloud">☁️</div>
+            <p class="upload-drop-main">Drag &amp; Drop your thesis file here</p>
+            <p class="upload-drop-sub">or click to browse your files</p>
+        </div>
+
+        <button class="upload-button">
+            Upload Document
+        </button>
+    </div>
+</section>
+{% endblock %}

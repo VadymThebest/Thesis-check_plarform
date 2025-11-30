@@ -1,0 +1,71 @@
+{% extends 'frontend/base_dashboard.html' %}
+
+{% block title %}Dashboard – Thesis Check{% endblock %}
+
+{% block content %}
+<section class="dashboard">
+    <div class="dashboard-grid dashboard-top">
+        <div class="dashboard-card action-card">
+            <div class="dashboard-icon">☁️</div>
+            <h3 class="dashboard-title">Upload New<br>Thesis</h3>
+        </div>
+
+        <div class="dashboard-card action-card">
+            <div class="dashboard-icon">⚙️</div>
+            <h3 class="dashboard-title">Check for<br>AI</h3>
+        </div>
+
+<h3 class="dashboard-title">
+    <a href="{% url 'check_plagiarism' %}" style="color: inherit; text-decoration: none;">
+        Check for<br>Plagiarism
+    </a>
+</h3>
+
+
+
+
+    <a href="{% url 'check_ai' %}" class="dashboard-card action-card dashboard-card-link">
+    <div class="dashboard-icon">⚙️</div>
+    <h3 class="dashboard-title">Check for<br>AI</h3>
+</a>
+
+
+    <div class="dashboard-grid dashboard-bottom">
+        <div class="dashboard-card doc-card">
+            <h3 class="doc-title">My Thesis<br>Document</h3>
+            <p class="doc-meta">Uploaded<br>on Apr 21, 2024</p>
+            <div class="doc-actions">
+                <a href="#">View</a>
+                <a href="#">Download</a>
+            </div>
+        </div>
+
+        <div class="dashboard-card doc-card">
+            <h3 class="doc-title">My Thesis<br>Document</h3>
+            <p class="doc-meta">Uploaded<br>on Apr 21, 2024</p>
+            <div class="doc-actions">
+                <a href="#">View</a>
+                <a href="#">Download</a>
+            </div>
+        </div>
+
+        <div class="dashboard-card doc-card">
+            <h3 class="doc-title">My Thesis<br>Document</h3>
+            <p class="doc-meta">Uploaded<br>on Apr 21, 2024</p>
+            <div class="doc-actions">
+                <a href="#">View</a>
+                <a href="#">Download</a>
+            </div>
+        </div>
+
+        <div class="dashboard-card doc-card">
+            <h3 class="doc-title">My Thesis<br>Document</h3>
+            <p class="doc-meta">Uploaded<br>on Apr 21, 2024</p>
+            <div class="doc-actions">
+                <a href="#">View</a>
+                <a href="#">Download</a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

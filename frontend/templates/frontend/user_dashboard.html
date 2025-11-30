@@ -1,0 +1,129 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+{% load static %}
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard - Thesis Check</title>
+    <link rel="stylesheet" href="{% static 'frontend/css/style.css' %}">
+</head>
+
+<body class="page-bg">
+    <!-- Üst navbar -->
+    <div class="navbar">
+        <div class="logo">THESIS CHECK</div>
+        <div class="nav-links">
+            <a href="{% url 'user_dashboard' %}">DASHBOARD</a>
+            <a href="{% url 'my_reports' %}">REPORTS</a>
+            <a href="{% url 'checks_history' %}">SETTINGS</a>
+        </div>
+    </div>
+
+    <main class="analytics-main">
+    <!-- Sayfa başlığı -->
+    <h1 class="analytics-title">Dashboard</h1>
+
+    <!-- Üstte 3 KPI kutusu -->
+    <section class="analytics-kpi-grid analytics-kpi-grid--top">
+        <div class="analytics-card">
+            <h3 class="analytics-kpi-label">Total Checks</h3>
+            <p class="analytics-kpi-value">{{ total_checks }}</p>
+        </div>
+
+        <div class="analytics-card">
+            <h3 class="analytics-kpi-label">Average Plagiarism</h3>
+            <p class="analytics-kpi-value">{{ avg_plagiarism }}%</p>
+        </div>
+
+        <div class="analytics-card">
+            <h3 class="analytics-kpi-label">Last Report Score</h3>
+            <p class="analytics-kpi-value">{{ last_report_score }}%</p>
+        </div>
+    </section>
+
+    <!-- Grafiğin olduğu kart -->
+    <section class="analytics-card analytics-chart-card">
+        <div class="analytics-chart-header">
+            <h2 class="analytics-card-title">Checks in the Last 7 Days</h2>
+            <p class="analytics-card-subtitle">Mon – Sun</p>
+        </div>
+
+        <div class="analytics-chart">
+            <svg viewBox="0 0 600 160" class="analytics-chart-svg">
+                <!-- çizgi ve noktalar senin önceki SVG kodunla aynı kalsın -->
+                <polyline
+                    class="analytics-chart-line"
+                    points="20,100 120,80 220,110 320,90 420,105 520,95 620,115" />
+                <circle cx="20"  cy="100" r="6" class="analytics-chart-dot" />
+                <circle cx="120" cy="80"  r="6" class="analytics-chart-dot" />
+                <circle cx="220" cy="110" r="6" class="analytics-chart-dot" />
+                <circle cx="320" cy="90"  r="6" class="analytics-chart-dot" />
+                <circle cx="420" cy="105" r="6" class="analytics-chart-dot" />
+                <circle cx="520" cy="95"  r="6" class="analytics-chart-dot" />
+                <circle cx="620" cy="115" r="6" class="analytics-chart-dot" />
+            </svg>
+
+            <div class="analytics-chart-days">
+                <span>Mon</span>
+                <span>Tue</span>
+                <span>Wed</span>
+                <span>Thu</span>
+                <span>Fri</span>
+                <span>Sat</span>
+                <span>Sun</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Recent Checks tablosu -->
+    <section class="analytics-card analytics-table-card">
+        <h2 class="analytics-card-title">Recent Checks</h2>
+
+        <table class="analytics-table">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Score</th>
+                    <th>File Name</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Apr 25, 2024</td>
+                    <td>84%</td>
+                    <td>Thesis_Draft.pdf</td>
+                    <td>Completed</td>
+                </tr>
+                <tr>
+                    <td>Apr 24, 2024</td>
+                    <td>17%</td>
+                    <td>Chapter2_docx</td>
+                    <td>Completed</td>
+                </tr>
+                <tr>
+                    <td>Apr 22, 2024</td>
+                    <td>23%</td>
+                    <td>review.pdf</td>
+                    <td>Completed</td>
+                </tr>
+                <tr>
+                    <td>Apr 21, 2024</td>
+                    <td>92%</td>
+                    <td>intro.docx</td>
+                    <td>Completed</td>
+                </tr>
+                <tr>
+                    <td>Apr 20, 2024</td>
+                    <td>73%</td>
+                    <td>report.docx</td>
+                    <td>Completed</td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+</main>
+
+
+    <!-- Chart.js script’in zaten en altta kalabilir -->
+</body>

@@ -1,0 +1,41 @@
+{% extends 'frontend/base.html' %}
+
+{% block title %}Sign Up – Thesis Check{% endblock %}
+
+{% block content %}
+<section class="login-section">
+    <div class="login-card">
+        <h1 class="signup-title">Sign up</h1>
+
+        <p class="signup-subtitle">
+            Create your account.
+        </p>
+
+        <form class="login-form">
+            <div class="login-field">
+                <label for="full_name">Full Name</label>
+                <input id="full_name" type="text" placeholder="">
+            </div>
+
+            <div class="login-field">
+                <label for="signup_email">Email Address</label>
+                <input id="signup_email" type="email" placeholder="">
+            </div>
+
+            <div class="login-field">
+                <label for="signup_password">Password</label>
+                <input id="signup_password" type="password" placeholder="">
+            </div>
+
+            <button type="submit" class="login-button">
+                Create an account
+            </button>
+
+            <p class="login-bottom-text">
+                Already a member?
+                <a href="{% url 'login' %}" class="login-signup-link">Log in</a>
+            </p>
+        </form>
+    </div>
+</section>
+{% endblock %}

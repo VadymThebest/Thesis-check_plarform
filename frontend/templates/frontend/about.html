@@ -1,0 +1,52 @@
+{% extends 'frontend/base.html' %}
+
+{% block title %}About – Thesis Check{% endblock %}
+
+{% block content %}
+<section class="about">
+    <div class="about-inner">
+        <h1 class="about-title">About Thesis Check</h1>
+
+        <p class="about-text">
+            ThesisCheck helps students ensure the academic integrity, originality,
+            and clarity of their thesis work through advanced plagiarism analysis
+            and smart writing tools.
+        </p>
+
+        <div class="about-cards">
+            <div class="about-card">
+                <div class="about-card-icon">
+                    🔍
+                </div>
+                <h3 class="about-card-title">Plagiarism<br>Detection</h3>
+                <p class="about-card-text">
+                    Detect similarity and ensure originality
+                    with high-accuracy scanning.
+                </p>
+            </div>
+
+            <div class="about-card">
+                <div class="about-card-icon">
+                    ✔️
+                </div>
+                <h3 class="about-card-title">Grammar<br>Validation</h3>
+                <p class="about-card-text">
+                    Fix grammar issues with intelligent
+                    context-aware suggestions.
+                </p>
+            </div>
+
+            <div class="about-card">
+                <div class="about-card-icon">
+                    📄
+                </div>
+                <h3 class="about-card-title">Citation<br>Support</h3>
+                <p class="about-card-text">
+                    Check references and generate
+                    proper citation formats.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
