@@ -15,7 +15,8 @@
     <p><strong>Citations Missing:</strong> 
         {% if submission.citations_missing %}Yes{% else %}No{% endif %}
     </p>
-    <a href="/" class="btn btn-primary">Upload Another File</a>
+    <p><strong>AI Detection Score:</strong> {{ submission.ai_score }}%</p>
+    <a href="/index/" class="btn btn-primary">Upload Another File</a>
   {% endif %}
 </div>
 {% endblock %}

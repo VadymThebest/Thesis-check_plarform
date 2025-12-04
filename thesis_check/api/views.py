@@ -1,5 +1,6 @@
 from rest_framework import generics, status
 from rest_framework.response import Response
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from checking.models import ThesisSubmission
 from .serializers import ThesisSubmissionSerializer
 from .nlp import run_plagiarism_and_grammar_check
@@ -7,7 +8,22 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 
+class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
+    def validate(self, attrs):
+        data = super().validate(attrs)
+
+        
+        data['user'] = {
+            'id': self.user.id,
+            'email': self.user.email,
+            'role': self.user.role,
+            'username': self.user.username,
+        }
+        return data
+    
 class CustomTokenObtainPairView(TokenObtainPairView):
+    serializer_class = CustomTokenObtainPairSerializer
+
     @swagger_auto_schema(
         operation_description="Получить access и refresh JWT токены",
         request_body=openapi.Schema(
@@ -35,6 +51,7 @@ class UploadThesisView(generics.CreateAPIView):
             # Run the check synchronously for now (can use Celery later)
             result = run_plagiarism_and_grammar_check(submission.file.path)
             submission.plagiarism_score = result["plagiarism"]
+            submission.ai_score = result["ai_score"]
             submission.grammar_issues = result["grammar"]
             submission.citations_missing = result["citations"]
             submission.status = "completed"

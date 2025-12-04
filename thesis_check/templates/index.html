@@ -24,8 +24,9 @@
                 <form id="uploadForm" method="POST" enctype="multipart/form-data" action="">
                     {% csrf_token %}
                     <div class="mb-3">
-                        <label for="thesisFile" class="form-label visually-hidden">Select File</label>
-                        <input class="form-control form-control-lg" type="file" id="thesisFile" name="file" required>
+                        <input type="file" id="thesisFile" name="file" class="visually-hidden" onchange="updateFileName()" required>
+                        <label for="thesisFile" class="btn btn-primary">Submit file</label>
+                        <span id="fileName" class="ms-3 text-muted">No file chosen</span>
                     </div>
                 
                     <div class="d-grid">
@@ -34,7 +35,17 @@
                         </button>
                     </div>
                 </form>
-                
+                <script>
+                function updateFileName() {
+                    const input = document.getElementById('thesisFile');
+                    const fileNameSpan = document.getElementById('fileName');
+                    if (input.files.length > 0) {
+                    fileNameSpan.textContent = input.files[0].name;
+                    } else {
+                        fileNameSpan.textContent = 'No file chosen';
+                    }
+                }
+                </script>         
                 <div id="resultArea" class="mt-4" style="display: none;">
                     <hr>
                     <h5 class="text-success">File Uploaded Successfully!</h5>
@@ -45,7 +56,7 @@
         </div>
 
         <div class="text-center text-muted mt-3">
-            <small>&copy; 2025 Your Team Name</small>
+            <small>&copy; 2025 Team 555</small>
         </div>
 
     </div>

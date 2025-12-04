@@ -1,5 +1,6 @@
 annotated-types==0.7.0
 asgiref==3.10.0
+openpyxl==3.1.2
 blis==0.7.11
 catalogue==2.0.10
 certifi==2025.10.5
@@ -10,6 +11,8 @@ confection==0.1.5
 cymem==2.0.11
 Django==5.2.7
 djangorestframework==3.15.1
+djangorestframework-simplejwt
+drf_yasg
 en-core-web-sm==3.7.1
 filelock==3.20.0
 fsspec==2025.10.0

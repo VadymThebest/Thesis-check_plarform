@@ -1,5 +1,6 @@
 import os
 from pathlib import Path
+from datetime import timedelta
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -15,6 +16,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'rest_framework_simplejwt',
     'pgvector.django',
     'checking',
     'api',
@@ -41,6 +43,12 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.AllowAny',  
     ),
 }
+
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=5),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
+}
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -77,20 +85,20 @@ WSGI_APPLICATION = 'thesis_check.wsgi.application'
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": "thesis_db",
+        "NAME": "submissions",
         "USER": "postgres",
-        "PASSWORD": "vadim_vadim",
+        "PASSWORD": "postgres",
         "HOST": "localhost",
         "PORT": "5432",
     }
 }
-LOGIN_URL = '/accounts/login/'
+LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/index/'
 LOGOUT_REDIRECT_URL = '/accounts/login/'
 
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [
-    BASE_DIR / "templates" / "assets",
+    BASE_DIR / "templates",
     BASE_DIR / "assets",
 ]
 STATIC_ROOT = BASE_DIR / 'staticfiles'

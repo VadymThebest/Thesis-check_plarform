@@ -13,6 +13,7 @@ class ThesisSubmission(models.Model):
     file = models.FileField(upload_to='uploads/')
     uploaded_at = models.DateTimeField(auto_now_add=True)
     plagiarism_score = models.FloatField(null=True, blank=True)
+    ai_score = models.FloatField(default=0)
     grammar_issues = models.IntegerField(null=True, blank=True)
     citations_missing = models.IntegerField(null=True, blank=True)
     status = models.CharField(max_length=20, default="processing")
@@ -27,5 +28,5 @@ class Article(models.Model):
     content = models.TextField()
     embedding = VectorField(dimensions=768)
 
-    def __str__(self):
-            return self.title
+    def __str__(self):   
+        return self.title

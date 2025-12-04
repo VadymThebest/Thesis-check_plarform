@@ -1,21 +1,27 @@
 import re
+import pandas as pd
 import language_tool_python
 from PyPDF2 import PdfReader
 import docx
 from functools import lru_cache
 from checking.semantic_search import check_plagiarism
+from api.ai_detector import detect_ai_text
+from api.language_tool_cached import LANGUAGE_TOOL
 
 
 @lru_cache(maxsize=1)
 def get_language_tool():
     print("Initializing LanguageTool (this will happen only once)...")
-    return language_tool_python.LanguageTool('en-US')
+    return language_tool_python.LanguageTool('en-US', server_mode=True)
 
 
 def extract_text(file_path: str) -> str:
-    """Extract text from PDF, DOCX, or TXT files."""
+    """Extract text from PDF, DOCX, TXT, CSV, or XLSX files."""
     try:
-        if file_path.lower().endswith(".pdf"):
+        file_path_lower = file_path.lower()
+
+        # PDF
+        if file_path_lower.endswith(".pdf"):
             text = ""
             with open(file_path, "rb") as f:
                 reader = PdfReader(f)
@@ -25,13 +31,25 @@ def extract_text(file_path: str) -> str:
                         text += page_text + " "
             return text.strip()
 
-        elif file_path.lower().endswith(".docx"):
+        # DOCX
+        elif file_path_lower.endswith(".docx"):
             document = docx.Document(file_path)
             return " ".join(p.text for p in document.paragraphs).strip()
 
-        elif file_path.lower().endswith(".txt"):
+        # TXT
+        elif file_path_lower.endswith(".txt"):
             with open(file_path, "r", encoding="utf-8") as f:
                 return f.read().strip()
+
+        # CSV
+        elif file_path_lower.endswith(".csv"):
+            df = pd.read_csv(file_path)
+            return df.to_string(index=False)
+
+        # XLSX
+        elif file_path_lower.endswith(".xlsx"):
+            df = pd.read_excel(file_path)
+            return df.to_string(index=False)
 
         else:
             print(f"⚠️ Unsupported file type: {file_path}")
@@ -56,8 +74,7 @@ def _preprocess_text(text: str, min_token_len=3) -> str:
 def count_grammar_issues(text: str) -> int:
     if not text:
         return 0
-    tool = get_language_tool()
-    matches = tool.check(text)
+    matches = LANGUAGE_TOOL.check(text)
     return len(matches)
 
 
@@ -84,7 +101,8 @@ def run_plagiarism_and_grammar_check(file_path: str):
         return {
             "plagiarism": 0.0,
             "grammar": 0,
-            "citations": 1
+            "citations": 1,
+            "ai_score": 0,
         }
 
     # Run semantic plagiarism check
@@ -95,8 +113,11 @@ def run_plagiarism_and_grammar_check(file_path: str):
     grammar_issues = count_grammar_issues(text)
     citations_missing = check_citations(text)
 
+    ai_score = detect_ai_text(text)
+
     return {
         "plagiarism": plagiarism_score,
         "grammar": grammar_issues,
-        "citations": citations_missing
+        "citations": citations_missing,
+        "ai_score": ai_score,
     }
