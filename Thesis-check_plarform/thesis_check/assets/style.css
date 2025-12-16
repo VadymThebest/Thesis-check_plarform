@@ -1,0 +1,40 @@
+/* Google'dan yazı tipi çekme */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap');
+
+/* 1. ARKA PLAN FOTOĞRAFI BÖLÜMÜ */
+body {
+    font-family: 'Inter', sans-serif;
+    
+    /* ÇOK ÖNEMLİ: 
+      Fotoğrafın adı "backgraund.jpg" (o harfi yok)
+      ve style.css'ten 2 klasör yukarıda.
+    */
+    background-image: url('../../backgraund.jpg');
+    
+    background-size: cover;          /* Tüm ekranı kapla */
+    background-position: center;     /* Ortala */
+    background-repeat: no-repeat;    /* Tekrar etme */
+    background-attachment: fixed;    /* Kaydırınca arka plan kaysın */
+    min-height: 100vh;               /* En az ekran boyutu kadar yer kapla */
+    
+    /* Arka planın çok parlak olmaması için hafif karartma */
+    /* Bu satırı beğenmezsen silebilirsin */
+    background-color: rgba(0, 0, 0, 0.3);
+    background-blend-mode: darken;
+}
+
+/* 2. ORTADAKİ BEYAZ KUTU (ANA İÇERİK) */
+main.container {
+    background-color: rgba(255, 255, 255, 0.98); /* Hafif şeffaf beyaz */
+    padding: 2.5rem 3rem;
+    border-radius: 15px;
+    margin-top: 5rem;    /* Üstteki navbar'dan boşluk */
+    margin-bottom: 5rem; /* Alttan boşluk */
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+/* Dosya yükleme butonunu biraz daha çekici hale getirelim */
+/* Bu kısım senin kodunda vardı, koruyoruz */
+.form-control:hover {
+    box-shadow: 0 0 1rem rgba(0,0,0,0.1) !important; /* Vurgu için gölge */
+}

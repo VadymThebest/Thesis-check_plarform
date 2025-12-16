@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block title %}Upload Thesis | Thesis Check Platform{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        
+        <div class="card shadow-sm border-0 upload-card">
+            <div class="card-body p-4 p-md-5 text-center">
+                
+                <h1 class="h3 mb-3 fw-light">Thesis Check Platform</h1>
+                {% if user.is_authenticated %}
+                <p class="fw-bold text-primary text-center mb-4" style="font-size: 1.25rem;">
+                 Logged in as: {{ user.username }}{% if user.role %} ({{ user.role|title }}){% endif %}
+                </p>
+                {% endif %}
+
+
+                <p class="text-muted mb-4">
+                    Upload your thesis for plagiarism, grammar, and format checking.
+                </p>
+
+                <form id="uploadForm" method="POST" enctype="multipart/form-data" action="">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <input type="file" id="thesisFile" name="file" class="visually-hidden" onchange="updateFileName()" required>
+                        <label for="thesisFile" class="btn btn-primary">Submit file</label>
+                        <span id="fileName" class="ms-3 text-muted">No file chosen</span>
+                    </div>
+                
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            Check File
+                        </button>
+                    </div>
+                </form>
+                <script>
+                function updateFileName() {
+                    const input = document.getElementById('thesisFile');
+                    const fileNameSpan = document.getElementById('fileName');
+                    if (input.files.length > 0) {
+                    fileNameSpan.textContent = input.files[0].name;
+                    } else {
+                        fileNameSpan.textContent = 'No file chosen';
+                    }
+                }
+                </script>         
+                <div id="resultArea" class="mt-4" style="display: none;">
+                    <hr>
+                    <h5 class="text-success">File Uploaded Successfully!</h5>
+                    <p>Now checking...</p>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="text-center text-muted mt-3">
+            <small>&copy; 2025 Team 555</small>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,37 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Thesis Check{% endblock %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="{% static 'staticfiles/style.css' %}">
+</head>
+<body>
+
+    <!-- NAVBAR (LOG OUT görünümü) -->
+    <header class="navbar">
+        <div class="nav-inner">
+            <div class="nav-left">
+                <a href="{% url 'index' %}" class="brand">THESIS CHECK</a>
+            </div>
+
+            <nav class="nav-center">
+                <a href="{% url 'index' %}">HOME</a>
+                <a href="{% url 'about' %}">ABOUT</a>
+                <a href="{% url 'contact' %}">CONTACT US</a>
+            </nav>
+
+            <div class="nav-right">
+                <a href="#" class="login-link">LOG OUT</a>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+</body>
+</html>
