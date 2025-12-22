@@ -1,0 +1,10 @@
+Thesis-Check_Frontend/node_modules
+/venv
+thesis_check/pgvector
+# Игнорировать все __pycache__ папки и их содержимое
+**/__pycache__/
+**/__pycache__/*
+
+# Игнорировать все migrations папки и их содержимое
+**/migrations/
+**/migrations/*
