@@ -16,7 +16,8 @@ const Navbar = () => {
   }, []);
 
   const handleLogout = () => {
-    localStorage.removeItem("authToken");
+    localStorage.removeItem("access");
+    localStorage.removeItem("refresh");
     localStorage.removeItem("user");
     navigate("/login");
     window.location.reload();
@@ -54,9 +55,15 @@ const Navbar = () => {
 
       {/* CENTER */}
       <div style={{ display: "flex", gap: "18px", alignItems: "center" }}>
-        <Link to="/" style={linkStyle}>Home</Link>
-        <Link to="/about" style={linkStyle}>About</Link>
-        <Link to="/contact" style={linkStyle}>Contact</Link>
+        <Link to="/" style={linkStyle}>
+          Home
+        </Link>
+        <Link to="/about" style={linkStyle}>
+          About
+        </Link>
+        <Link to="/contact" style={linkStyle}>
+          Contact
+        </Link>
       </div>
 
       {/* RIGHT */}
@@ -95,19 +102,19 @@ const Navbar = () => {
             {/* USER INFO */}
             <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
               <span style={{ fontSize: "13px", opacity: 0.85 }}>
-                {user.email}
+                {user.email || "Unknown"}
               </span>
               <span
                 style={{
                   fontSize: "11px",
                   padding: "2px 8px",
                   borderRadius: "999px",
-                  backgroundColor: roleBadgeColor[user.role] || "#64748b",
+                  backgroundColor: roleBadgeColor[user?.role] || "#64748b",
                   color: "#020617",
                   fontWeight: 600,
                 }}
               >
-                {user.role.toUpperCase()}
+                {user?.role ? user.role.toUpperCase() : "STUDENT"}
               </span>
             </div>
 

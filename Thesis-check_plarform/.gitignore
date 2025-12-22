@@ -7,3 +7,8 @@ thesis_check/pgvector
 # Игнорировать все migrations папки и их содержимое
 **/migrations/
 **/migrations/*
+
+# React frontend
+Thesis-Check_Frontend/node_modules/
+Thesis-Check_Frontend/build/
+Thesis-Check_Frontend/.env*

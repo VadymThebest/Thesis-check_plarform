@@ -24,10 +24,10 @@ const Login = () => {
     try {
       const res = await login(email, password);
 
-      // 🔐 JWT
+      // 🔐 Сохраняем JWT токен
       localStorage.setItem("access", res.access);
 
-      // 👤 USER INFO
+      // 👤 Сохраняем инфо пользователя
       localStorage.setItem("user", JSON.stringify(res.user));
 
       navigate("/dashboard");
@@ -139,6 +139,7 @@ const Login = () => {
           </button>
         </form>
 
+        {/* 🔹 Ссылка на регистрацию */}
         <p style={{ textAlign: "center", fontSize: "13px", marginTop: "4px" }}>
           Don&apos;t have an account?{" "}
           <Link to="/signup" style={{ color: "#fbbf24" }}>
