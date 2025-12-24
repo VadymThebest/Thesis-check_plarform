@@ -1,636 +1,84 @@
-/* src/styles.css */
-
-:root {
-  --bg-main: #021434;
-  --card-bg: #0b265a;
-  --table-bg: #141e3f;
-  --text-main: #fdf7e9;
-  --text-muted: #c5c9da;
-  --accent: #d4a93b;
-}
-
+/* === GLOBAL RESET – KENAR BOŞLUKLARI TAMAMEN KALDIRIR === */
 * {
   box-sizing: border-box;
 }
 
-body {
+html,
+body,
+#root {
   margin: 0;
-  font-family: "Times New Roman", serif;
-  background-color: var(--bg-main);
-  color: var(--text-main);
-}
-
-.app-root {
-  min-height: 100vh;
-  background-color: var(--bg-main);
-}
-
-.app-main {
-  padding: 80px 0 40px;
-}
-
-.page {
-  max-width: 1100px;
-  margin: 0 auto;
-  padding: 0 24px;
-}
-
-/* NAVBAR */
-.navbar {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 64px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 40px;
-  background-color: var(--bg-main);
-  z-index: 10;
-}
-
-.logo {
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  color: var(--text-main);
-  text-decoration: none;
-}
-
-.navbar-center {
-  display: flex;
-  gap: 24px;
-}
-
-.navbar-right {
-  display: flex;
-}
-
-.nav-link {
-  font-size: 14px;
-  color: var(--text-main);
-  text-decoration: none;
-}
-
-.nav-link-active {
-  border-bottom: 2px solid var(--accent);
-}
-
-.nav-button {
-  border: none;
-  background: none;
-  color: var(--text-main);
-  cursor: pointer;
-}
-
-/* HERO */
-.hero {
-  text-align: center;
-  padding: 120px 0 80px;
-}
-
-.hero-title {
-  font-size: 48px;
-  line-height: 1.1;
-  margin-bottom: 24px;
-}
-
-.hero-subtitle {
-  font-size: 18px;
-  color: var(--text-muted);
-  max-width: 600px;
-  margin: 0 auto 32px;
-}
-
-/* BUTTONS */
-.primary-button {
-  padding: 14px 32px;
-  border-radius: 999px;
-  border: none;
-  background-color: var(--accent);
-  color: #1b1b1b;
-  font-size: 16px;
-  cursor: pointer;
-}
-
-.hero-button {
-  margin-top: 8px;
-}
-
-/* SECTIONS / CARDS */
-.section {
-  padding: 40px 0 60px;
-}
-
-.section-narrow {
-  max-width: 720px;
-  margin: 0 auto;
-}
-
-.section-title {
-  text-align: center;
-  font-size: 32px;
-  margin-bottom: 12px;
-}
-
-.section-description {
-  text-align: center;
-  color: var(--text-muted);
-  max-width: 700px;
-  margin: 0 auto 32px;
-}
-
-.cards-row {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 24px;
-}
-
-.info-card,
-.dashboard-card,
-.thesis-card {
-  background: var(--card-bg);
-  border-radius: 16px;
-  padding: 24px;
-  text-align: center;
-}
-
-.info-icon {
-  font-size: 32px;
-  margin-bottom: 12px;
-}
-
-.info-title {
-  font-size: 20px;
-  margin-bottom: 8px;
-}
-
-.info-text {
-  font-size: 14px;
-  color: var(--text-muted);
-}
-
-/* PAGE TITLES */
-.page-title {
-  text-align: center;
-  font-size: 32px;
-  margin-top: 20px;
-  margin-bottom: 12px;
-}
-
-/* AUTH PAGES */
-.centered-page {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding-top: 80px;
-}
-
-.auth-card {
-  width: 420px;
-  background: var(--bg-main);
-  border-radius: 24px;
-  padding: 40px;
-  border: 1px solid #3b4a75;
-}
-
-.auth-title {
-  text-align: center;
-  margin-bottom: 8px;
-}
-
-.auth-subtitle {
-  text-align: center;
-  color: var(--text-muted);
-  margin-bottom: 24px;
-}
-
-.auth-form {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.auth-label {
-  display: flex;
-  flex-direction: column;
-  font-size: 14px;
-  gap: 6px;
-}
-
-.auth-input {
-  padding: 10px 12px;
-  border-radius: 999px;
-  border: 1px solid #3b4a75;
-  background: transparent;
-  color: var(--text-main);
-}
-
-.auth-forgot {
-  text-align: right;
-  font-size: 12px;
-  color: var(--text-muted);
-  margin-top: 4px;
-}
-
-.auth-button {
-  width: 100%;
-  margin-top: 10px;
-}
-
-.auth-footer {
-  margin-top: 18px;
-  font-size: 14px;
-  text-align: center;
-}
-
-.auth-link {
-  color: var(--accent);
-  text-decoration: none;
-}
-
-.auth-error {
-  color: #ff6b6b;
-  font-size: 13px;
-}
-
-/* DASHBOARD CARDS */
-.dashboard-card {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 600;
-  cursor: pointer;
-  text-decoration: none;
-  color: var(--text-main);
-}
-
-.thesis-card h3 {
-  margin-top: 0;
-}
-
-.thesis-card p {
-  margin: 4px 0 12px;
-  color: var(--text-muted);
-}
-
-.thesis-card-actions {
-  display: flex;
-  justify-content: center;
-  gap: 16px;
-}
-
-.link-button {
-  border: none;
-  background: none;
-  color: var(--accent);
-  cursor: pointer;
-  font-size: 14px;
-}
-
-/* DROPZONE */
-.drop-zone {
-  margin: 32px 0;
-  border: 2px dashed #56689c;
-  border-radius: 24px;
-  padding: 60px 20px;
-  text-align: center;
-  cursor: pointer;
-}
-
-.drop-zone-dragging {
-  background-color: rgba(255, 255, 255, 0.03);
-}
-
-.drop-zone-icon {
-  font-size: 40px;
-  margin-bottom: 16px;
-}
-
-.drop-zone-text {
-  font-size: 16px;
-}
-
-.drop-zone-subtext {
-  font-size: 12px;
-  color: var(--text-muted);
-  margin-top: 6px;
-}
-
-.hidden-file-input {
-  display: none;
-}
-
-.status-text {
-  text-align: center;
-  color: var(--text-muted);
-  margin-bottom: 16px;
-}
-
-.upload-button {
-  display: block;
-  margin: 0 auto;
-}
-
-/* TABLES */
-.table-card {
-  margin-top: 32px;
-  background: var(--table-bg);
-  border-radius: 24px;
-  padding: 24px 28px;
-}
-
-.data-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 14px;
-}
-
-.data-table th,
-.data-table td {
-  padding: 12px 8px;
-  text-align: left;
-}
-
-.data-table thead {
-  color: #cfd5e8;
-}
-
-.data-table tbody tr:nth-child(even) {
-  background-color: rgba(255, 255, 255, 0.02);
-}
-
-.table-title {
-  margin-bottom: 12px;
-  font-weight: 600;
-}
-
-/* REPORT PAGE */
-.report-card {
-  text-align: left;
-}
-
-.report-main-value {
-  font-size: 32px;
-  margin: 8px 0;
-}
-
-.report-tag {
-  display: inline-block;
-  padding: 4px 10px;
-  border-radius: 999px;
-  font-size: 12px;
-}
-
-.report-tag-green {
-  background: #1f8b4c;
-}
-
-.report-subtext {
-  font-size: 13px;
-  color: var(--text-muted);
-}
-
-.report-details {
-  margin-top: 32px;
-}
-
-.report-details-title {
-  font-size: 16px;
-  margin-bottom: 12px;
-}
-
-.report-list {
-  list-style: none;
   padding: 0;
-  margin: 0 0 24px;
-}
-
-.report-list li {
-  margin-bottom: 6px;
-  font-size: 14px;
-}
-
-.dot {
-  display: inline-block;
-  width: 10px;
-  height: 10px;
-  border-radius: 999px;
-  margin-right: 8px;
-}
-
-.dot-blue {
-  background: #4a7dff;
-}
-
-.dot-red {
-  background: #ff5c5c;
-}
-
-.dot-yellow {
-  background: #f6c744;
-}
-
-.dot-purple {
-  background: #b07fff;
-}
-
-.report-download {
-  display: block;
-  margin: 0 auto;
-}
-
-/* ADMIN LAYOUT */
-.admin-layout {
-  display: grid;
-  grid-template-columns: 220px 1fr;
-  gap: 32px;
-  padding-top: 40px;
-}
-
-.admin-sidebar {
-  background: var(--table-bg);
-  border-radius: 24px;
-  padding: 24px;
-}
-
-.admin-sidebar-title {
-  font-weight: 600;
-  margin-bottom: 24px;
-}
-
-.admin-sidebar-item {
-  display: block;
   width: 100%;
-  text-align: left;
-  padding: 10px 14px;
-  margin-bottom: 8px;
-  border-radius: 12px;
-  border: none;
-  background: transparent;
-  color: var(--text-main);
-  cursor: pointer;
+  min-height: 100%;
 }
 
-.admin-sidebar-item-active {
-  background: #1f325f;
-}
-
-.admin-content {
-  padding-top: 8px;
-}
-
-.admin-stats-row .info-card {
-  text-align: left;
-}
-
-.stat-label {
-  font-size: 14px;
-  color: var(--text-muted);
-}
-
-.stat-value {
-  font-size: 24px;
-  margin-top: 8px;
-}
-
-/* Admin top nav (stats) */
-.admin-top-nav {
-  display: flex;
-  gap: 16px;
-  margin-bottom: 16px;
-}
-
-.admin-top-nav-item {
-  border: none;
-  background: transparent;
-  color: var(--text-muted);
-  cursor: pointer;
-}
-
-.admin-top-nav-item-active {
-  color: var(--text-main);
-  border-bottom: 2px solid var(--accent);
-}
-
-/* Chart placeholder */
-.chart-card {
-  margin-top: 24px;
-  margin-bottom: 24px;
-  background: var(--table-bg);
-  border-radius: 24px;
-  padding: 24px 28px;
-}
-
-.chart-placeholder {
-  margin-top: 16px;
-}
-
-.chart-svg {
+/* Eğer App wrapper varsa */
+.App {
+  margin: 0;
+  padding: 0;
   width: 100%;
-  height: 120px;
 }
 
-.chart-days {
-  display: flex;
-  justify-content: space-between;
-  font-size: 12px;
-  color: #c5c9da;
-  margin-top: 8px;
+/* === GLOBAL MOBILE FIX (all pages) === */
+html, body, #root {
+  width: 100%;
+  min-height: 100%;
+  margin: 0;
+  padding: 0;
 }
 
-/* RESPONSIVE */
+* { box-sizing: border-box; }
+
+/* Yatay taşmayı kes */
+body { overflow-x: hidden; }
+
+/* Görseller ve içerikler taşmasın */
+img, video, canvas, svg {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Mobilde text/input/button taşmalarını önle */
+button, input, select, textarea {
+  max-width: 100%;
+}
+
+/* Eğer bir yerde maxWidth'li container yüzünden ortada ince kolon oluşuyorsa:
+   Mobilde full genişliğe zorla */
 @media (max-width: 768px) {
-  .navbar {
-    padding: 0 16px;
-  }
-
-  .navbar-center {
-    display: none;
-  }
-
-  .admin-layout {
-    grid-template-columns: 1fr;
-  }
-
-  .admin-sidebar {
-    order: 2;
+  .container, .page, .wrapper, .content, .main {
+    max-width: 100% !important;
+    width: 100% !important;
   }
 }
-/* ADMIN LAYOUT */
-.admin-layout {
-  display: flex;
-  gap: 2.5rem;
+
+html, body, #root {
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+  background: #021434;
 }
 
-/* SOL SİDEBAR */
-.admin-sidebar {
-  width: 220px;
-  background: #0b1830;
-  border-radius: 12px;
-  padding: 2rem 1.5rem;
-}
+/* ===== Navbar Mobile Fix ===== */
+@media (max-width: 700px) {
+  /* Navbar iç padding azalt */
+  .tc-nav-inner {
+    padding: 10px 12px !important;
+    grid-template-columns: auto 1fr auto !important;
+  }
 
-.admin-sidebar-title {
-  color: #ffffff;
-  font-size: 1.2rem;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  margin-bottom: 2rem;
-}
+  /* Ortadaki linkleri gizle (Home/About/Contact) */
+  .tc-nav-inner .navCenter {
+    display: none !important;
+  }
 
-.admin-sidebar-item {
-  width: 100%;
-  text-align: left;
-  padding: 0.8rem 1rem;
-  margin-bottom: 0.5rem;
-  border-radius: 999px;
-  border: none;
-  background: transparent;
-  color: #c6d3f5;
-  font-size: 0.95rem;
-  cursor: pointer;
-}
+  /* Markayı ortala */
+  .brandWrap {
+    justify-self: center !important;
+  }
 
-.admin-sidebar-item-active {
-  background: #1f2a40;
-  color: #ffffff;
-}
-
-/* SAĞ İÇERİK */
-.admin-content {
-  flex: 1;
-}
-
-/* Üst tablar (Dashboard / Reports / Settings) */
-.admin-top-tabs {
-  display: flex;
-  gap: 1rem;
-  margin-bottom: 1.5rem;
-}
-
-.admin-top-tab {
-  padding: 0.4rem 1rem;
-  border-radius: 999px;
-  border: 1px solid transparent;
-  background: transparent;
-  color: #c6d3f5;
-  font-size: 0.9rem;
-  cursor: pointer;
-}
-
-.admin-top-tab-active {
-  background: #1f2a40;
-  border-color: #33415c;
-  color: #ffffff;
-}
-
-/* Admin stats row Figma’ya daha yakın dursun */
-.admin-stats-row .info-card {
-  align-items: flex-start;
-  text-align: left;
-}
-
-.admin-recent-users {
-  margin-top: 2rem;
+  /* Sağ taraftaki email çok uzunsa taşmasın */
+  .tc-nav-inner span[title] {
+    max-width: 120px !important;
+  }
 }

@@ -1,17 +1,25 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { useTheme } from "../context/ThemeContext";
+import { Link } from "react-router-dom";
 
 const Report = () => {
   const { colors } = useTheme();
 
-  // Dummy report data (backend bağlanınca API'den gelecek)
-  const report = {
-    title: "Thesis Draft - April Report",
-    date: "April 25, 2024",
-    plagiarismScore: "15%",
-    aiScore: "8%",
-    summary:
-      "This report analyses the originality and AI-generated likelihood of the submitted thesis. Highlighted sections require review by the supervisor.",
+  const report = useMemo(() => {
+    try {
+      const raw = localStorage.getItem("latestReport");
+      return raw ? JSON.parse(raw) : null;
+    } catch {
+      return null;
+    }
+  }, []);
+
+  const formatDate = (iso) => {
+    try {
+      return new Date(iso).toLocaleString();
+    } catch {
+      return "";
+    }
   };
 
   return (
@@ -23,95 +31,125 @@ const Report = () => {
         padding: "40px 20px",
       }}
     >
-      <div
-        style={{
-          maxWidth: "900px",
-          margin: "0 auto",
-          backgroundColor: colors.cardBg,
-          padding: "30px",
-          borderRadius: "16px",
-          border: `1px solid ${colors.text}25`,
-          boxShadow: "0 8px 28px rgba(0,0,0,0.25)",
-        }}
-      >
-        <h1 style={{ fontSize: "30px", marginBottom: "10px" }}>{report.title}</h1>
+      <div style={{ maxWidth: "1000px", margin: "0 auto" }}>
+        <h1 style={{ fontSize: "32px", marginBottom: "14px" }}>Report</h1>
 
-        <p style={{ opacity: 0.7, marginBottom: "20px" }}>{report.date}</p>
+        {!report ? (
+          <div
+            style={{
+              backgroundColor: colors.cardBg,
+              border: `1px solid ${colors.text}25`,
+              borderRadius: "16px",
+              padding: "24px",
+            }}
+          >
+            <p style={{ opacity: 0.9, marginBottom: "14px" }}>
+              There's no report yet. You need to upload a thesis first.
+            </p>
 
-        {/* SCORES */}
-        <div
-          style={{
-            display: "flex",
-            gap: "20px",
-            marginBottom: "20px",
-            flexWrap: "wrap",
-          }}
-        >
-          <ScoreCard
-            label="Plagiarism Score"
-            value={report.plagiarismScore}
-            color="#ff4d4f"
-            colors={colors}
-          />
-          <ScoreCard
-            label="AI Score"
-            value={report.aiScore}
-            color="#fbbf24"
-            colors={colors}
-          />
-        </div>
+            <Link to="/upload" style={{ textDecoration: "none" }}>
+              <button
+                style={{
+                  backgroundColor: "#ffbf24",
+                  color: "#1a1a1a",
+                  padding: "10px 18px",
+                  borderRadius: "12px",
+                  border: "none",
+                  cursor: "pointer",
+                  fontWeight: 700,
+                }}
+              >
+                Go to Upload
+              </button>
+            </Link>
+          </div>
+        ) : (
+          <>
+            <div
+              style={{
+                backgroundColor: colors.cardBg,
+                border: `1px solid ${colors.text}25`,
+                borderRadius: "16px",
+                padding: "22px",
+                marginBottom: "18px",
+              }}
+            >
+              <p style={{ opacity: 0.8, marginBottom: "6px" }}>File</p>
+              <p style={{ fontSize: "18px", fontWeight: 700 }}>
+                {report.fileName}
+              </p>
 
-        {/* SUMMARY SECTION */}
-        <div
-          style={{
-            backgroundColor: colors.pageBg,
-            borderRadius: "12px",
-            padding: "20px",
-            border: `1px solid ${colors.text}20`,
-            marginBottom: "30px",
-          }}
-        >
-          <h3 style={{ marginBottom: "10px", fontSize: "20px" }}>
-            Report Summary
-          </h3>
-          <p style={{ opacity: 0.85, lineHeight: 1.6 }}>{report.summary}</p>
-        </div>
+              <p style={{ opacity: 0.7, marginTop: "10px" }}>
+                Uploaded at: {formatDate(report.uploadedAt)}
+              </p>
 
-        {/* DOWNLOAD BUTTON */}
-        <button
-          style={{
-            width: "100%",
-            padding: "14px",
-            backgroundColor: "#fbbf24",
-            border: "none",
-            borderRadius: "12px",
-            fontSize: "16px",
-            fontWeight: 600,
-            cursor: "pointer",
-            color: "#000",
-          }}
-        >
-          Download PDF Report
-        </button>
+              <p style={{ opacity: 0.7, marginTop: "6px" }}>
+                Status: <strong>{report.status}</strong>
+              </p>
+            </div>
+
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
+                gap: "16px",
+              }}
+            >
+              <div
+                style={{
+                  backgroundColor: colors.cardBg,
+                  border: `1px solid ${colors.text}25`,
+                  borderRadius: "16px",
+                  padding: "18px",
+                }}
+              >
+                <p style={{ opacity: 0.8 }}>Plagiarism Score</p>
+                <p style={{ fontSize: "34px", fontWeight: 800 }}>
+                  {report.plagiarismScore}%
+                </p>
+                <p style={{ opacity: 0.7, fontSize: "13px" }}>
+                  Demo value (backend gelince gerçek skor gelecek)
+                </p>
+              </div>
+
+              <div
+                style={{
+                  backgroundColor: colors.cardBg,
+                  border: `1px solid ${colors.text}25`,
+                  borderRadius: "16px",
+                  padding: "18px",
+                }}
+              >
+                <p style={{ opacity: 0.8 }}>AI-Generated Score</p>
+                <p style={{ fontSize: "34px", fontWeight: 800 }}>
+                  {report.aiScore}%
+                </p>
+                <p style={{ opacity: 0.7, fontSize: "13px" }}>
+                  Demo value (backend gelince gerçek skor gelecek)
+                </p>
+              </div>
+
+              <div
+                style={{
+                  backgroundColor: colors.cardBg,
+                  border: `1px solid ${colors.text}25`,
+                  borderRadius: "16px",
+                  padding: "18px",
+                }}
+              >
+                <p style={{ opacity: 0.8 }}>Next Actions</p>
+                <ul style={{ marginTop: "10px", opacity: 0.85 }}>
+                  <li>Review similarity sections</li>
+                  <li>Check citations & references</li>
+                  <li>Re-run analysis after edits</li>
+                </ul>
+              </div>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );
 };
-
-const ScoreCard = ({ label, value, color, colors }) => (
-  <div
-    style={{
-      backgroundColor: colors.pageBg,
-      padding: "16px",
-      borderRadius: "12px",
-      flex: 1,
-      minWidth: "200px",
-      border: `1px solid ${colors.text}20`,
-    }}
-  >
-    <h4 style={{ marginBottom: "8px", fontSize: "16px" }}>{label}</h4>
-    <p style={{ fontSize: "28px", fontWeight: 700, color }}>{value}</p>
-  </div>
-);
 
 export default Report;

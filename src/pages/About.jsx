@@ -1,126 +1,145 @@
-// src/pages/About.js
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import { useTheme } from "../context/ThemeContext";
 
 const About = () => {
-  const { colors } = useTheme();
+  const { colors, theme } = useTheme();
+  const navigate = useNavigate();
+
+  const features = [
+    {
+      title: "Plagiarism Detection",
+      desc: "Check similarity across academic sources and detect copied content.",
+      path: "/check-plagiarism",
+    },
+    {
+      title: "AI-Generated Content Detection",
+      desc: "Identify AI-written text and potential academic integrity risks.",
+      path: "/check-ai",
+    },
+    {
+      title: "Upload & Analyze Thesis",
+      desc: "Upload PDF or DOCX files and start analysis instantly.",
+      path: "/upload",
+    },
+    {
+      title: "Reports & Dashboard",
+      desc: "Track reports, history, and results in your dashboard.",
+      path: "/dashboard",
+    },
+  ];
+
+  const pageTextColor = theme === "light" ? "#1a1a1a" : "#ffffff";
 
   return (
     <div
       style={{
-        backgroundColor: colors.pageBg,
-        color: colors.text,
+        background: theme === "light" ? "transparent" : "#021434",
         minHeight: "100vh",
-        padding: "60px 0",
       }}
     >
       <div
         style={{
-          maxWidth: "1120px",
+          maxWidth: "1100px",
           margin: "0 auto",
-          padding: "0 32px",
+          padding: "0 16px",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
           textAlign: "center",
+          color: pageTextColor,
         }}
       >
-        <h1 style={{ fontSize: "32px", marginBottom: "12px" }}>
+        <h1 style={{ fontSize: "38px", marginBottom: "16px" }}>
           About Thesis Check
         </h1>
 
         <p
           style={{
-            fontSize: "18px",
-            maxWidth: "780px",
-            margin: "0 auto 40px",
-            opacity: 0.9,
-            lineHeight: 1.6,
+            fontSize: "17px",
+            lineHeight: 1.7,
+            opacity: 1,
+            maxWidth: "70ch",
           }}
         >
-          Thesis Check is an academic integrity platform that helps students,
-          supervisors and institutions review thesis documents for plagiarism
-          and AI-generated content, and manage all reports from a single,
-          organised workspace.
+          Thesis Check is an academic integrity platform designed for students
+          and institutions. It helps detect plagiarism, identify AI-generated
+          content, and manage thesis evaluation workflows in a clear and
+          structured way.
         </p>
 
-        {/* 3 KUTU */}
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(3, 1fr)",
-            gap: "20px",
-            marginBottom: "60px",
-          }}
-        >
-          <Card
-            colors={colors}
-            title="For Students"
-            text="Allows students to check originality before submission, understand similarity scores and improve academic writing."
-          />
-
-          <Card
-            colors={colors}
-            title="For Supervisors"
-            text="Provides supervisors with a concise view of plagiarism and AI detection results, highlighting critical sections."
-          />
-
-          <Card
-            colors={colors}
-            title="For Institutions"
-            text="Supports universities in applying consistent academic integrity policies and tracking thesis checks."
-          />
-        </div>
-
-        {/* How it works bölümü */}
-        <h2 style={{ fontSize: "26px", marginBottom: "18px" }}>
-          How Thesis Check fits into the thesis workflow
+        <h2 style={{ marginTop: "42px", marginBottom: "16px" }}>
+          What Thesis Check offers
         </h2>
 
-        <p
+        <div
           style={{
-            fontSize: "16px",
-            maxWidth: "900px",
-            margin: "0 auto 40px",
-            opacity: 0.9,
-            lineHeight: 1.6,
+            width: "100%",
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
+            gap: "18px",
+            marginTop: "20px",
           }}
         >
-          Instead of treating plagiarism and AI checks as final steps, Thesis
-          Check integrates them into the whole thesis-writing process. Students
-          can upload drafts, receive reports, revise their work and upload final
-          versions with a clear history of changes.
-        </p>
+          {features.map((item) => (
+            <div
+              key={item.title}
+              style={{
+                backgroundColor: colors.cardBg,
+                border: `1px solid ${colors.text}18`,
+                borderRadius: "16px",
+                padding: "20px",
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "space-between",
+                textAlign: "left",
+              }}
+            >
+              <div>
+                <h3 style={{ marginTop: 0 }}>{item.title}</h3>
+                <p style={{ opacity: 0.8, lineHeight: 1.6 }}>{item.desc}</p>
+              </div>
 
-        <Card
-          colors={colors}
-          title="What Thesis Check offers"
-          text={
-            <>
-              • Plagiarism similarity detection <br />
-              • AI-generated content detection <br />
-              • Structured PDF & dashboard reports <br />
-              • Revision & history tracking <br />
-              • Secure, browser-based platform
-            </>
-          }
-        />
+              <button
+                onClick={() => navigate(item.path)}
+                style={{
+                  marginTop: "16px",
+                  alignSelf: "flex-start",
+                  backgroundColor: "transparent",
+                  color: colors.text,
+                  border: `1px solid ${colors.text}35`,
+                  padding: "8px 14px",
+                  borderRadius: "999px",
+                  cursor: "pointer",
+                  fontWeight: 700,
+                }}
+              >
+                Learn more →
+              </button>
+            </div>
+          ))}
+        </div>
+
+        <div
+          style={{
+            width: "100%",
+            marginTop: "50px",
+            padding: "20px",
+            borderRadius: "14px",
+            backgroundColor: colors.cardBg,
+            border: `1px solid ${colors.text}18`,
+            opacity: 1,
+            textAlign: "left",
+          }}
+        >
+          <p style={{ margin: 0 }}>
+            Thesis Check is built to support academic integrity while keeping the
+            user experience simple, clear, and accessible across devices.
+          </p>
+        </div>
       </div>
     </div>
   );
 };
-
-const Card = ({ title, text, colors }) => (
-  <div
-    style={{
-      backgroundColor: colors.cardBg,
-      borderRadius: "14px",
-      border: `1px solid ${colors.text}20`,
-      padding: "20px",
-      textAlign: "left",
-      lineHeight: 1.6,
-    }}
-  >
-    <h3 style={{ marginBottom: "12px", fontSize: "20px" }}>{title}</h3>
-    <p style={{ opacity: 0.85 }}>{text}</p>
-  </div>
-);
 
 export default About;

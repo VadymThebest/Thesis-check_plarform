@@ -1,158 +1,276 @@
-// src/components/Navbar.jsx
-import React from "react";
-import { Link, useNavigate } from "react-router-dom";
-import LogoAnalytics from "./LogoAnalytics";
+import React, { useState } from "react";
+import { NavLink, useNavigate } from "react-router-dom";
+import Sidebar from "./Sidebar";
+import LogoMark from "./LogoMark";
 import { useTheme } from "../context/ThemeContext";
 
 const Navbar = () => {
+  const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
-  const { theme, toggleTheme, colors } = useTheme();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  // 🔑 Her render'da localStorage'dan oku
-  const isLoggedIn = !!localStorage.getItem("authToken");
-  const userEmail = localStorage.getItem("userEmail") || "";
+  // AUTH
+  const token =
+    localStorage.getItem("token") ||
+    localStorage.getItem("authToken") ||
+    localStorage.getItem("accessToken");
 
-  const logout = () => {
-    localStorage.removeItem("authToken");
-    localStorage.removeItem("userEmail");
-    localStorage.removeItem("fullName");
+  const isLoggedIn = !!token;
+
+  const userEmail =
+    localStorage.getItem("userEmail") ||
+    localStorage.getItem("email") ||
+    localStorage.getItem("username") ||
+    "";
+
+  const role = (localStorage.getItem("role") || "student").toLowerCase();
+  const isAdvisor = role === "advisor";
+  const isAdmin = role === "admin";
+
+  const handleLogout = () => {
+    localStorage.clear();
     navigate("/");
+    window.location.reload();
   };
 
-  return (
-    <header
-      style={{
-        width: "100%",
-        padding: "16px 48px",
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
-        boxSizing: "border-box",
-        backgroundColor: colors.navbarBg,
-        color: colors.text,
-        borderBottom: "1px solid rgba(255,255,255,0.15)",
-        position: "sticky",
-        top: 0,
-        zIndex: 50,
-      }}
+  const isDark = theme === "dark";
+
+  // Navbar theme
+  const navBg = isDark ? "rgba(2,20,52,0.96)" : "#FFC531";
+  const textColor = isDark ? "#ffffff" : "#021434";
+  const borderColor = isDark
+    ? "rgba(255,255,255,0.15)"
+    : "rgba(2,20,52,0.25)";
+
+  // ROLE LINKS (sidebar için)
+  let roleLinks = [];
+  if (isAdmin) {
+    roleLinks = [
+      { to: "/admin/dashboard", label: "Admin Dashboard" },
+      { to: "/admin/stats", label: "Admin Stats" },
+    ];
+  } else if (isAdvisor) {
+    roleLinks = [
+      { to: "/dashboard", label: "Dashboard" },
+      { to: "/checks-history", label: "Checks History" },
+      { to: "/workspace", label: "Workspace" },
+      { to: "/report", label: "Report" },
+    ];
+  } else {
+    roleLinks = [
+      { to: "/upload", label: "Upload Thesis" },
+      { to: "/dashboard", label: "Dashboard" },
+      { to: "/my-reports", label: "My Reports" },
+      { to: "/checks-history", label: "Checks History" },
+      { to: "/workspace", label: "Workspace" },
+      { to: "/report", label: "Report" },
+    ];
+  }
+
+  const linkStyle = ({ isActive }) => ({
+    textDecoration: "none",
+    color: textColor,
+    fontWeight: 900,
+    padding: "8px 14px",
+    borderRadius: "999px",
+   border: isActive ? `1px solid ${borderColor}` : "1px solid transparent",
+    background: isActive
+      ? isDark
+        ? "rgba(255,255,255,0.08)"
+        : "rgba(2,20,52,0.10)"
+      : "transparent",
+    whiteSpace: "nowrap",
+  });
+
+
+  const Brand = () => (
+    <div
+    className="brandWrap"
+      onClick={() => navigate("/")}
+      style={{ cursor: "pointer", display: "flex", alignItems: "center" }}
+      title="Go Home"
     >
-      {/* SOL: Logo + isim */}
-      <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-        <LogoAnalytics size={26} />
-        <span
-          style={{
-            letterSpacing: "0.2em",
-            fontSize: "14px",
-            textTransform: "uppercase",
-          }}
-        >
-          THESIS CHECK
-        </span>
-      </div>
-
-      {/* ORTA: Menü */}
-      <nav style={{ display: "flex", gap: "22px", fontSize: "14px" }}>
-        <Link to="/" style={link(colors.text)}>
-          Home
-        </Link>
-        <Link to="/about" style={link(colors.text)}>
-          About
-        </Link>
-        <Link to="/upload" style={link(colors.text)}>
-          Upload Thesis
-        </Link>
-
-        {/* 🔒 Login olduktan sonra görünenler */}
-        {isLoggedIn && (
-          <>
-            <Link to="/dashboard" style={link(colors.text)}>
-              Dashboard
-            </Link>
-            <Link to="/my-reports" style={link(colors.text)}>
-              My Reports
-            </Link>
-            <Link to="/checks-history" style={link(colors.text)}>
-              Checks History
-            </Link>
-            <Link to="/workspace" style={link(colors.text)}>
-              Workspace
-            </Link>
-            <Link to="/report" style={link(colors.text)}>
-              Report
-            </Link>
-            <Link to="/admin" style={link(colors.text)}>
-              Admin Dashboard
-            </Link>
-            <Link to="/admin/stats" style={link(colors.text)}>
-              Admin Stats
-            </Link>
-          </>
-        )}
-      </nav>
-
-      {/* SAĞ: Tema switch + login/logout */}
-      <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-        {/* Tema butonu */}
-        <button
-          onClick={toggleTheme}
-          style={{
-            background: "transparent",
-            border: "1px solid #fbbf24",
-            padding: "6px 12px",
-            borderRadius: "999px",
-            color: "#fbbf24",
-            cursor: "pointer",
-            fontSize: "12px",
-          }}
-        >
-          {theme === "dark" ? "☀️ Light" : "🌙 Dark"}
-        </button>
-
-        {/* Kullanıcı maili */}
-        {isLoggedIn && userEmail && (
-          <span
-            style={{
-              fontSize: "12px",
-              maxWidth: "200px",
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-              whiteSpace: "nowrap",
-            }}
-            title={userEmail}
-          >
-            {userEmail}
-          </span>
-        )}
-
-        {/* Login / Logout butonu */}
-        {!isLoggedIn ? (
-          <Link to="/login" style={{ textDecoration: "none" }}>
-            <button style={btn}>LOG IN</button>
-          </Link>
-        ) : (
-          <button onClick={logout} style={btn}>
-            LOG OUT
-          </button>
-        )}
-      </div>
-    </header>
+      <LogoMark size={44} />
+    </div>
   );
-};
 
-const link = (color) => ({
-  textDecoration: "none",
-  color,
-});
+  return (
+    <>
+      {/* SIDEBAR – SADECE GİRİŞTE */}
+      {isLoggedIn && (
+        <Sidebar
+          isOpen={sidebarOpen}
+          onClose={() => setSidebarOpen(false)}
+          isLoggedIn={isLoggedIn}
+          roleLinks={roleLinks}
+        />
+      )}
 
-const btn = {
-  background: "transparent",
-  border: "1px solid #fbbf24",
-  color: "#fbbf24",
-  padding: "6px 16px",
-  borderRadius: "20px",
-  cursor: "pointer",
-  fontSize: "12px",
-  fontWeight: 500,
+      <header
+      className="tc-navbar"
+        style={{
+          position: "sticky",
+          top: 0,
+          zIndex: 999,
+          width: "100%",
+          background: navBg,
+          borderBottom: `1px solid ${borderColor}`,
+        }}
+      >
+        <div
+        className="navGrid"
+          style={{
+            width: "100%",
+            padding: "12px 24px",
+            display: "grid",
+            gridTemplateColumns: "auto 1fr auto",
+            alignItems: "center",
+            gap: 12,
+            boxSizing: "border-box",
+        
+          }}
+          
+        >
+          {/* LEFT */}
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            {isLoggedIn ? (
+              <button
+              className="hamburgerBtn"
+  onClick={() => setSidebarOpen(true)}
+  style={{
+    border: `1px solid ${borderColor}`,
+    background: isDark ? "transparent" : "rgba(255,255,255,0.35)",
+    color: textColor,
+    borderRadius: 12,
+    padding: "8px 10px",
+    cursor: "pointer",
+    fontWeight: 900,
+  }}
+  aria-label="Open menu"
+  title="Menu"
+>
+  ☰
+</button>
+
+            ) : (
+              <Brand />
+            )}
+          </div>
+
+          {/* CENTER */}
+          <div 
+        className="navLinks"
+          
+          style={{ display: "flex", justifyContent: "center", gap: 12 }}>
+           
+            {!isLoggedIn ? (
+              <>
+                <NavLink to="/" style={linkStyle}>
+                  Home
+                </NavLink>
+                <NavLink to="/about" style={linkStyle}>
+                  About
+                </NavLink>
+                <NavLink to="/contact" style={linkStyle}>
+                  Contact
+                </NavLink>
+              </>
+            ) : (
+             
+              <Brand />
+            )}
+          </div>
+
+          {/* RIGHT */}
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 10,
+              justifyContent: "flex-end",
+            }}
+          >
+            {isLoggedIn && (
+              <span
+                style={{
+                  fontSize: 13,
+                  color: textColor,
+                  opacity: 0.9,
+                  maxWidth: 200,
+                  overflow: "hidden",
+                  whiteSpace: "nowrap",
+                  textOverflow: "ellipsis",
+                }}
+                title={userEmail}
+              >
+                {userEmail}
+              </span>
+            )}
+
+            <button
+              onClick={toggleTheme}
+              style={{
+                padding: "7px 12px",
+                borderRadius: "999px",
+                border: `1px solid ${borderColor}`,
+                background: isDark
+                  ? "transparent"
+                  : "rgba(255,255,255,0.35)",
+                color: textColor,
+                cursor: "pointer",
+                fontWeight: 900,
+              }}
+            >
+              {isDark ? "🌙 Dark" : "☀️ Light"}
+            </button>
+
+            {isLoggedIn ? (
+              <button
+                onClick={handleLogout}
+                style={{
+                  padding: "9px 16px",
+                  borderRadius: "999px",
+                  background: isDark ? "#FFC531" : "#021434",
+                  color: isDark ? "#021434" : "#ffffff",
+                  border: "none",
+                  fontWeight: 950,
+                  cursor: "pointer",
+                }}
+              >
+                LOG OUT
+              </button>
+            ) : (
+              <button
+                onClick={() => navigate("/login")}
+                style={{
+                  padding: "9px 16px",
+                  borderRadius: "999px",
+                  background: isDark ? "#021434" : "#021434",
+                  color: "#ffffff",
+                  border: "none",
+                  fontWeight: 950,
+                  cursor: "pointer",
+                }}
+              >
+                LOG IN
+              </button>
+            )}
+          </div>
+        </div>
+              <style>{`
+  /* Giriş YAPINCA hamburger her ekranda görünsün */
+  .hamburgerBtn { display: inline-flex; }
+
+  /* Giriş YOKKEN (public) menü mobilde daralınca linkleri saklayabilirsin */
+  @media (max-width: 700px) {
+    .navLinks { display: none !important; }
+  }
+`}</style>
+
+
+      </header>
+    </>
+  );
 };
 
 export default Navbar;
