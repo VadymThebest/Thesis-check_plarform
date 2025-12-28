@@ -1,11 +1,14 @@
 from django.urls import path
 from rest_framework_simplejwt.views import TokenRefreshView, TokenObtainPairView
+
 from .views import (
     UploadThesisView,
     ThesisResultView,
     ResultView,
     CustomTokenObtainPairView,
-    RegisterView
+    RegisterView,
+    ForgotPasswordView,
+    ResetPasswordView,
 )
 
 urlpatterns = [
@@ -15,10 +18,18 @@ urlpatterns = [
     path('check/', ResultView.as_view(), name='check_all'),
 
     # 🔹 JWT Auth API
-    path('token/', CustomTokenObtainPairView.as_view(), name='token_obtain_pair'),   
-    path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),        
+    path('token/', CustomTokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('token/default/', TokenObtainPairView.as_view(), name='token_obtain_pair_default'),
 
     # 🔹 Registration API
     path('register/', RegisterView.as_view(), name='register'),
+
+    # 🔹 Password reset 
+    path('forgot-password/', ForgotPasswordView.as_view(), name='forgot_password'),
+    path(
+        'reset-password/<uidb64>/<token>/',
+        ResetPasswordView.as_view(),
+        name='reset_password'
+    ),
 ]

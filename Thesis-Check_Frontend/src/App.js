@@ -3,6 +3,7 @@ import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
 import { ThemeProvider } from "./context/ThemeContext";
+import { AuthProvider } from "./context/AuthContext";
 import Layout from "./components/Layout";
 import PrivateRoute from "./components/PrivateRoute";
 
@@ -20,6 +21,8 @@ import CheckAI from "./pages/CheckAI";
 import Report from "./pages/Report";
 import MyReports from "./pages/MyReports";
 import ChecksHistory from "./pages/ChecksHistory";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminStats from "./pages/AdminStats";
@@ -30,6 +33,7 @@ import Workspace from "./pages/Workspace";
 
 function App() {
   return (
+    <AuthProvider>
     <ThemeProvider>
       <Router>
         <Layout>
@@ -40,6 +44,8 @@ function App() {
             <Route path="/contact" element={<Contact />} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password/:uid/:token" element={<ResetPassword />} />
 
             {/* 👤 User (JWT protected) */}
             <Route
@@ -137,6 +143,7 @@ function App() {
         </Layout>
       </Router>
     </ThemeProvider>
+    </AuthProvider>
   );
 }
 

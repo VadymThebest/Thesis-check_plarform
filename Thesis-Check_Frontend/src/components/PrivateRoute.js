@@ -1,15 +1,12 @@
-import React from "react";
 import { Navigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 const PrivateRoute = ({ children }) => {
-  const token = localStorage.getItem("access");
-  const user = localStorage.getItem("user");
+  const { isAuthenticated, loading } = useAuth();
 
-  if (!token || !user) return <Navigate to="/login" replace />;
+  if (loading) return null;
 
-  try {
-    JSON.parse(user); // проверка, что user валидный JSON
-  } catch {
+  if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
   }
 

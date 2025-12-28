@@ -1,27 +1,12 @@
 // src/components/Navbar.jsx
-import React, { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import React from "react";
+import { Link } from "react-router-dom";
 import { useTheme } from "../context/ThemeContext";
+import { useAuth } from "../context/AuthContext";
 
 const Navbar = () => {
   const { toggleTheme } = useTheme();
-  const navigate = useNavigate();
-  const [user, setUser] = useState(null);
-
-  useEffect(() => {
-    const stored = localStorage.getItem("user");
-    if (stored) {
-      setUser(JSON.parse(stored));
-    }
-  }, []);
-
-  const handleLogout = () => {
-    localStorage.removeItem("access");
-    localStorage.removeItem("refresh");
-    localStorage.removeItem("user");
-    navigate("/login");
-    window.location.reload();
-  };
+  const { isAuthenticated, user, logout } = useAuth();
 
   const roleBadgeColor = {
     student: "#38bdf8",
@@ -55,15 +40,9 @@ const Navbar = () => {
 
       {/* CENTER */}
       <div style={{ display: "flex", gap: "18px", alignItems: "center" }}>
-        <Link to="/" style={linkStyle}>
-          Home
-        </Link>
-        <Link to="/about" style={linkStyle}>
-          About
-        </Link>
-        <Link to="/contact" style={linkStyle}>
-          Contact
-        </Link>
+        <Link to="/" style={linkStyle}>Home</Link>
+        <Link to="/about" style={linkStyle}>About</Link>
+        <Link to="/contact" style={linkStyle}>Contact</Link>
       </div>
 
       {/* RIGHT */}
@@ -72,7 +51,7 @@ const Navbar = () => {
           🌙 Light
         </button>
 
-        {!user ? (
+        {!isAuthenticated ? (
           <Link to="/login" style={loginBtn}>
             Log in
           </Link>
@@ -102,14 +81,16 @@ const Navbar = () => {
             {/* USER INFO */}
             <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
               <span style={{ fontSize: "13px", opacity: 0.85 }}>
-                {user.email || "Unknown"}
+                {user?.email || "Unknown"}
               </span>
+
               <span
                 style={{
                   fontSize: "11px",
                   padding: "2px 8px",
                   borderRadius: "999px",
-                  backgroundColor: roleBadgeColor[user?.role] || "#64748b",
+                  backgroundColor:
+                    roleBadgeColor[user?.role] || "#64748b",
                   color: "#020617",
                   fontWeight: 600,
                 }}
@@ -118,7 +99,7 @@ const Navbar = () => {
               </span>
             </div>
 
-            <button onClick={handleLogout} style={logoutBtn}>
+            <button onClick={logout} style={logoutBtn}>
               Logout
             </button>
           </>
