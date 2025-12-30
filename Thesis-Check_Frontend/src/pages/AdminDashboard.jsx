@@ -1,4 +1,3 @@
-// src/pages/AdminDashboard.jsx
 import React, { useEffect, useState } from "react";
 import api from "../api/client";
 import { useTheme } from "../context/ThemeContext";
@@ -25,33 +24,45 @@ const AdminDashboard = () => {
     fetchReports();
   }, []);
 
-  // ======= STATS CALCULATION =======
+  // ======= STATS =======
   const totalDocs = reports.length;
+  const completedReports = reports.filter((r) => r.status === "completed").length;
+  const totalUsers = new Set(reports.map((r) => r.student_email)).size;
 
-  const avg = (field) => {
-    const valid = reports.filter((r) => r[field] !== null && r[field] !== undefined);
-    if (valid.length === 0) return 0;
-    return (
-      valid.reduce((sum, r) => sum + Number(r[field]), 0) / valid.length
-    ).toFixed(1);
+  // ======= ACTIONS =======
+  const handleApprove = async (id) => {
+    try {
+      await api.post(`/check/${id}/approve/`);
+      setReports((prev) =>
+        prev.map((r) => (r.id === id ? { ...r, status: "approved" } : r))
+      );
+    } catch {
+      alert("Failed to approve report");
+    }
   };
 
-  const avgPlagiarism = avg("plagiarism_score");
-  const avgAI = avg("ai_score");
-  const avgGrammar = avg("grammar_issues");
+  const handleReject = async (id) => {
+    try {
+      await api.post(`/check/${id}/reject/`);
+      setReports((prev) =>
+        prev.map((r) => (r.id === id ? { ...r, status: "rejected" } : r))
+      );
+    } catch {
+      alert("Failed to reject report");
+    }
+  };
 
-  // ======= RENDER =======
   return (
     <div
       style={{
         backgroundColor: colors.pageBg,
+        color: colors.text,
         minHeight: "100vh",
         padding: "40px 20px",
-        color: colors.text,
       }}
     >
-      <div style={{ maxWidth: "1100px", margin: "0 auto" }}>
-        <h1 style={{ fontSize: "32px", marginBottom: "30px" }}>
+      <div style={{ maxWidth: "1080px", margin: "0 auto" }}>
+        <h1 style={{ fontSize: "32px", marginBottom: "20px" }}>
           Admin Dashboard
         </h1>
 
@@ -60,69 +71,44 @@ const AdminDashboard = () => {
 
         {!loading && !error && (
           <>
-            {/* ===== TOP STATS ===== */}
+            {/* TOP STATS */}
             <div
               style={{
                 display: "grid",
-                gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))",
+                gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))",
                 gap: "20px",
                 marginBottom: "40px",
               }}
             >
-              <StatCard
-                label="Total Documents"
-                value={totalDocs}
-                color="#fbbf24"
-                colors={colors}
-              />
-              <StatCard
-                label="Avg Plagiarism (%)"
-                value={avgPlagiarism}
-                color="#ff4d4f"
-                colors={colors}
-              />
-              <StatCard
-                label="Avg AI Score (%)"
-                value={avgAI}
-                color="#38bdf8"
-                colors={colors}
-              />
-              <StatCard
-                label="Avg Grammar Issues"
-                value={avgGrammar}
-                color="#34d399"
-                colors={colors}
-              />
+              <StatCard label="Total Users" value={totalUsers} color="#fbbf24" colors={colors} />
+              <StatCard label="Total Documents" value={totalDocs} color="#4dd0e1" colors={colors} />
+              <StatCard label="Reports Generated" value={completedReports} color="#ff4d4f" colors={colors} />
             </div>
 
-            {/* ===== RECENT REPORTS ===== */}
+            {/* RECENT REPORTS */}
             <div
               style={{
                 backgroundColor: colors.cardBg,
-                padding: "24px",
+                padding: "20px",
                 borderRadius: "16px",
                 border: `1px solid ${colors.text}25`,
               }}
             >
               <h2 style={{ fontSize: "22px", marginBottom: "20px" }}>
-                Recent Submissions
+                Recent Reports
               </h2>
 
-              {reports.length === 0 && (
-                <p style={{ opacity: 0.7 }}>No reports yet.</p>
-              )}
+              {reports.length === 0 && <p style={{ opacity: 0.7 }}>No reports yet.</p>}
 
               {reports.slice(0, 10).map((r) => (
                 <div
                   key={r.id}
                   style={{
-                    padding: "14px 0",
+                    padding: "12px 0",
                     borderBottom: `1px solid ${colors.text}20`,
                   }}
                 >
-                  <p style={{ fontWeight: 600 }}>
-                    Report #{r.id}
-                  </p>
+                  <p style={{ fontWeight: 600 }}>Report #{r.id}</p>
                   <p style={{ fontSize: "14px", opacity: 0.8 }}>
                     Student: {r.student_email || "—"}
                   </p>
@@ -131,9 +117,38 @@ const AdminDashboard = () => {
                   </p>
                   <p style={{ fontSize: "14px", opacity: 0.8 }}>
                     Plagiarism: {r.plagiarism_score ?? "—"}% | AI:{" "}
-                    {r.ai_score ?? "—"}% | Grammar:{" "}
-                    {r.grammar_issues ?? "—"}
+                    {r.ai_score ?? "—"}% | Grammar: {r.grammar_issues ?? "—"}
                   </p>
+
+                  {/* Approve / Reject buttons */}
+                  <div style={{ marginTop: "8px", display: "flex", gap: "10px" }}>
+                    <button
+                      onClick={() => handleApprove(r.id)}
+                      style={{
+                        background: "#34d399",
+                        color: "#fff",
+                        border: "none",
+                        padding: "6px 12px",
+                        borderRadius: "8px",
+                        cursor: "pointer",
+                      }}
+                    >
+                      Approve
+                    </button>
+                    <button
+                      onClick={() => handleReject(r.id)}
+                      style={{
+                        background: "#f87171",
+                        color: "#fff",
+                        border: "none",
+                        padding: "6px 12px",
+                        borderRadius: "8px",
+                        cursor: "pointer",
+                      }}
+                    >
+                      Reject
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>
@@ -155,9 +170,7 @@ const StatCard = ({ label, value, color, colors }) => (
     }}
   >
     <h3 style={{ opacity: 0.8, marginBottom: "10px" }}>{label}</h3>
-    <p style={{ fontSize: "32px", fontWeight: 700, color }}>
-      {value}
-    </p>
+    <p style={{ fontSize: "32px", fontWeight: 700, color }}>{value}</p>
   </div>
 );
 
