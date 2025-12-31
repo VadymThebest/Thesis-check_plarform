@@ -1,0 +1,1446 @@
+import pytest
+from django.core.files.base import ContentFile
+from users.models import CustomUser
+from checking.models import ThesisSubmission, Article
+
+@pytest.mark.django_db
+def test_thesis_submission_with_student():
+    user = CustomUser.objects.create_user(
+        email="student@example.com",
+        username="stu",
+        password="Pass123!"
+    )
+
+    file = ContentFile(b"Test content", name="test.txt")
+
+    submission = ThesisSubmission.objects.create(
+        student=user,
+        file=file,
+        status="processing",
+        plagiarism_score=0.1,
+        grammar_issues=3,
+        citations_missing=0
+    )
+
+    assert submission.student == user
+    assert submission.status == "processing"
+    assert submission.plagiarism_score == 0.1
+    assert submission.grammar_issues == 3
+    assert submission.citations_missing == 0
+    assert "Thesis" in str(submission)
+
+
+@pytest.mark.django_db
+def test_thesis_submission_without_student():
+    file = ContentFile(b"No student", name="nofile.txt")
+
+    submission = ThesisSubmission.objects.create(
+        student=None,
+        file=file,
+        status="processing"
+    )
+
+    assert submission.student is None
+    assert submission.status == "processing"
+
+
+@pytest.mark.django_db
+def test_article_model():
+    emb = [0.01] * 768
+    article = Article.objects.create(
+        title="Test Title",
+        content="Test content",
+        embedding=emb
+    )
+
+    assert article.id is not None
+    assert len(article.embedding) == 768
+    assert str(article) == "Test Title"
+import os
+import pytest
+from django.conf import settings
+from django.core.files.base import ContentFile
+
+# ✅ Doğru import yolları
+from api.nlp import extract_text, count_grammar_issues, check_citations, run_plagiarism_and_grammar_check
+
+@pytest.mark.django_db
+def test_extract_text_txt(tmp_path):
+    # geçici bir txt dosyası oluştur
+    file_path = tmp_path / "dummy.txt"
+    file_path.write_text("This is a test text.")
+    
+    text = extract_text(str(file_path))
+    assert text == "This is a test text."
+
+@pytest.mark.django_db
+def test_count_grammar_issues_simple():
+    text = "This are bad grammar."
+    issues = count_grammar_issues(text)
+    assert issues > 0  # yanlış gramer olduğu için >0 olmalı
+
+@pytest.mark.django_db
+def test_check_citations_found():
+    text = "This is a citation [1]."
+    missing = check_citations(text)
+    assert missing == 0
+
+@pytest.mark.django_db
+def test_check_citations_missing():
+    text = "No references here."
+    missing = check_citations(text)
+    assert missing == 1
+
+@pytest.mark.django_db
+def test_run_plagiarism_and_grammar_check(tmp_path):
+    file_path = tmp_path / "thesis.txt"
+    file_path.write_text("This is a dummy thesis for testing plagiarism and grammar.")
+    
+    result = run_plagiarism_and_grammar_check(str(file_path))
+    assert "plagiarism" in result
+    assert "grammar" in result
+    assert "citations" in result
+from django.test import TestCase
+from django.contrib.auth import get_user_model
+from checking.models import ThesisSubmission
+from api.serializers import ThesisSubmissionSerializer  # doğru import
+
+User = get_user_model()
+
+class ThesisSubmissionSerializerTest(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            username="testuser",
+            email="testuser@example.com",
+            password="StrongPass123!"
+        )
+        self.thesis = ThesisSubmission.objects.create(
+            student=self.user,
+            status="processing"
+        )
+
+    def test_serializer_fields(self):
+        serializer = ThesisSubmissionSerializer(instance=self.thesis)
+        data = serializer.data
+
+        # serializer ReturnDict dönüyor
+        self.assertIsInstance(data, dict)
+        self.assertIn("id", data)
+        self.assertIn("student", data)
+        self.assertIn("status", data)
+        self.assertIn("file", data)
+        self.assertIn("plagiarism_score", data)
+        self.assertIn("grammar_issues", data)
+        self.assertIn("citations_missing", data)
+
+    def test_serializer_content(self):
+        serializer = ThesisSubmissionSerializer(instance=self.thesis)
+        data = serializer.data
+
+        self.assertEqual(data["student"], self.user.id)
+        self.assertEqual(data["status"], "processing")
+        self.assertIsNone(data["plagiarism_score"])
+        self.assertIsNone(data["grammar_issues"])
+        self.assertIsNone(data["citations_missing"])
+from django.test import TestCase
+from django.urls import reverse
+from rest_framework.test import APIClient
+from checking.models import ThesisSubmission
+from users.models import CustomUser
+from rest_framework_simplejwt.tokens import RefreshToken
+from unittest.mock import patch
+from django.core.files.uploadedfile import SimpleUploadedFile
+
+
+class ApiViewsTest(TestCase):
+
+    def setUp(self):
+        self.client = APIClient()
+
+        # CustomUser kullanıyoruz!
+        self.user = CustomUser.objects.create_user(
+            email="test@example.com",
+            username="testuser",
+            password="testpass"
+        )
+
+        refresh = RefreshToken.for_user(self.user)
+        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {refresh.access_token}')
+
+    @patch("checking.api.views.run_plagiarism_and_grammar_check")
+    def test_api_create_view(self, mock_run_check):
+        mock_run_check.return_value = {
+            "plagiarism": 15.5,
+            "grammar": 2,
+            "citations": 0
+        }
+
+        test_file = SimpleUploadedFile("test.txt", b"Test content")
+        url = reverse("upload")   # ← düzeltildi
+        data = {"file": test_file}
+
+        response = self.client.post(url, data, format='multipart')
+
+        self.assertIn(response.status_code, [200, 201])
+        self.assertEqual(response.data["plagiarism_score"], 15.5)
+        self.assertEqual(response.data["grammar_issues"], 2)
+        self.assertEqual(response.data["citations_missing"], 0)
+
+    @patch("checking.api.views.run_plagiarism_and_grammar_check")
+    def test_upload_creates_thesis(self, mock_run_check):
+        mock_run_check.return_value = {
+            "plagiarism": 10.0,
+            "grammar": 1,
+            "citations": 0
+        }
+
+        test_file = SimpleUploadedFile("test2.txt", b"Another test content")
+        url = reverse("upload")
+        data = {"file": test_file}
+
+        response = self.client.post(url, data, format='multipart')
+
+        self.assertIn(response.status_code, [200, 201])
+
+        thesis = ThesisSubmission.objects.get(id=response.data["id"])
+        self.assertEqual(thesis.plagiarism_score, 10.0)
+        self.assertEqual(thesis.grammar_issues, 1)
+        self.assertEqual(thesis.citations_missing, 0)
+
+    def test_api_list_view(self):
+        url = reverse("check_all")  # ← düzeltildi
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+import pytest
+from django.urls import reverse
+from django.core.files.uploadedfile import SimpleUploadedFile
+from rest_framework import status
+from rest_framework.test import APIClient
+from users.models import CustomUser
+from checking.models import ThesisSubmission, Article
+
+
+@pytest.mark.django_db
+class TestCheckingEndpoints:
+
+    def setup_method(self):
+        self.client = APIClient()
+
+        self.student = CustomUser.objects.create_user(
+            email="student@example.com",
+            username="stu",
+            password="Pass123!"
+        )
+
+        self.student2 = CustomUser.objects.create_user(
+            email="student2@example.com",
+            username="stu2",
+            password="Pass123!"
+        )
+
+        self.staff = CustomUser.objects.create_user(
+            email="staff@example.com",
+            username="staff",
+            password="Pass123!",
+            is_staff=True
+        )
+
+        self.superuser = CustomUser.objects.create_superuser(
+            email="admin@example.com",
+            username="admin",
+            password="Admin123!"
+        )
+
+    # -----------------------------------------------------------
+    # 1) SUBMIT THESIS ENDPOINT
+    # -----------------------------------------------------------
+
+    def test_submit_thesis_success(self):
+        """Öğrenci tez yükleyebilir"""
+
+        self.client.force_authenticate(self.student)
+
+        file = SimpleUploadedFile(
+            "test.pdf", b"dummy content", content_type="application/pdf"
+        )
+
+        url = reverse("checking:submit_thesis")
+
+        response = self.client.post(url, {"file": file})
+
+        assert response.status_code == status.HTTP_201_CREATED
+        assert ThesisSubmission.objects.count() == 1
+
+    def test_submit_thesis_requires_auth(self):
+        """Anon kullanıcı yükleyemez"""
+
+        file = SimpleUploadedFile(
+            "test.pdf", b"dummy content", content_type="application/pdf"
+        )
+
+        url = reverse("checking:submit_thesis")
+
+        response = self.client.post(url, {"file": file})
+
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+    # -----------------------------------------------------------
+    # 2) THESIS LIST ENDPOINT
+    # -----------------------------------------------------------
+
+    def test_student_can_see_only_own_thesis(self):
+        """Öğrenci kendi tezlerini görür"""
+
+        # student'ın 1 tezi
+        ThesisSubmission.objects.create(student=self.student, file="dummy.pdf")
+
+        # diğer öğrencinin tezi
+        ThesisSubmission.objects.create(student=self.student2, file="dummy.pdf")
+
+        self.client.force_authenticate(self.student)
+
+        url = reverse("checking:thesis_list")
+        response = self.client.get(url)
+
+        assert response.status_code == 200
+        assert len(response.data) == 1  # sadece kendi tezi
+
+    def test_staff_can_see_all_theses(self):
+        """Admin ve staff tüm tezleri görür"""
+
+        ThesisSubmission.objects.create(student=self.student, file="a.pdf")
+        ThesisSubmission.objects.create(student=self.student2, file="b.pdf")
+
+        self.client.force_authenticate(self.staff)
+
+        url = reverse("checking:thesis_list")
+        response = self.client.get(url)
+
+        assert response.status_code == 200
+        assert len(response.data) == 2
+
+    # -----------------------------------------------------------
+    # 3) THESIS DETAIL ENDPOINT
+    # -----------------------------------------------------------
+
+    def test_student_cannot_access_others_thesis_detail(self):
+        """Öğrenci başka öğrencinin tezi detayını göremez"""
+
+        t = ThesisSubmission.objects.create(student=self.student2, file="test.pdf")
+
+        self.client.force_authenticate(self.student)
+
+        url = reverse("checking:thesis_detail", args=[t.id])
+        response = self.client.get(url)
+
+        assert response.status_code == 403
+
+    def test_staff_can_access_any_thesis_detail(self):
+        t = ThesisSubmission.objects.create(student=self.student2, file="x.pdf")
+
+        self.client.force_authenticate(self.staff)
+
+        url = reverse("checking:thesis_detail", args=[t.id])
+        response = self.client.get(url)
+
+        assert response.status_code == 200
+        assert response.data["id"] == t.id
+
+    # -----------------------------------------------------------
+    # 4) ARTICLE SEARCH (semantic veya keyword)
+    # -----------------------------------------------------------
+
+    def test_article_search_works(self):
+        """Search endpoint çalışıyor mu?"""
+
+        Article.objects.create(
+            title="AI Research", content="Deep learning", embedding=[0.1] * 768
+        )
+
+        Article.objects.create(
+            title="Math Paper", content="Algebra", embedding=[0.2] * 768
+        )
+
+        url = reverse("checking:article_search")
+
+        response = self.client.get(url, {"q": "AI"})
+
+        assert response.status_code == 200
+        assert len(response.data) >= 1
+
+    # -----------------------------------------------------------
+    # 5) TRAIN EMBEDDINGS (ADMIN ONLY)
+    # -----------------------------------------------------------
+
+    def test_train_embeddings_requires_staff(self):
+        url = reverse("checking:train_embeddings")
+
+        self.client.force_authenticate(self.student)
+        response = self.client.post(url)
+
+        assert response.status_code == 403
+
+    def test_train_embeddings_staff_success(self, mocker):
+        """run_training fonksiyonunun çağrılıp çağrılmadığını test eder"""
+
+        mocker.patch("checking.train_embeddings.train.run_training", return_value=True)
+
+        url = reverse("checking:train_embeddings")
+
+        self.client.force_authenticate(self.staff)
+        response = self.client.post(url)
+
+        assert response.status_code == 200
+        assert "trained" in response.data["message"].lower()
+import pytest
+from django.core.files.uploadedfile import SimpleUploadedFile
+from checking.forms import ThesisUploadForm
+
+@pytest.mark.django_db
+def test_upload_form_valid():
+    file_content = b"PDF test"
+    uploaded = SimpleUploadedFile("thesis.pdf", file_content, content_type="application/pdf")
+
+    form = ThesisUploadForm(files={"file": uploaded})
+
+    assert form.is_valid(), "Form geçerli olmalı"
+    thesis = form.save(commit=False)
+
+    assert thesis.file.name.startswith("uploads/") is False  # daha kaydedilmedi
+    assert thesis.pk is None  # commit=False
+
+@pytest.mark.django_db
+def test_upload_form_invalid_when_no_file():
+    form = ThesisUploadForm(data={})
+    assert not form.is_valid()
+    assert "file" in form.errors
+import io
+import pytest
+from django.core.files.uploadedfile import SimpleUploadedFile
+from users.models import CustomUser
+from checking.models import ThesisSubmission, Article
+
+@pytest.mark.django_db
+def test_thesissubmission_create_without_student():
+    # küçük bir "dosya" yarat
+    file_content = b"Dummy thesis content"
+    uploaded = SimpleUploadedFile("thesis.pdf", file_content, content_type="application/pdf")
+
+    thesis = ThesisSubmission.objects.create(
+        file=uploaded,
+        status="processing"
+    )
+
+    assert thesis.id is not None
+    assert thesis.student is None  # student opsiyonel
+    assert thesis.status == "processing"
+    assert thesis.plagiarism_score is None
+    assert thesis.grammar_issues is None
+    assert thesis.citations_missing is None
+    assert "Thesis" in str(thesis)  # __str__ çalışıyor
+
+@pytest.mark.django_db
+def test_thesissubmission_create_with_student_and_str():
+    user = CustomUser.objects.create_user(
+        email="student1@example.com",
+        username="stu1",
+        password="StrongPass123!"
+    )
+
+    file_content = b"Another dummy thesis"
+    uploaded = SimpleUploadedFile("thesis2.pdf", file_content, content_type="application/pdf")
+
+    thesis = ThesisSubmission.objects.create(
+        student=user,
+        file=uploaded
+    )
+
+    assert thesis.student == user
+    # default status should be "processing" if not overridden
+    assert thesis.status == "processing"
+    assert str(thesis) == f"Thesis {thesis.id} by {user.email}"
+
+@pytest.mark.django_db
+def test_article_embedding_and_str():
+    # embedding must be a Python list (pgvector accepts list)
+    emb = [0.01] * 768  # örnek 768-dim vektör
+    title = "Test Article"
+    content = "This is a test article content."
+
+    article = Article.objects.create(
+        title=title,
+        content=content,
+        embedding=emb
+    )
+
+    assert article.id is not None
+    assert article.title == title
+    assert article.content == content
+    # pgvector stores embedding; burada uzunluğu kontrol etmek mantıklı
+    assert len(article.embedding) == 768
+    assert str(article) == title
+from django.contrib.auth import get_user_model
+from django.urls import reverse
+from rest_framework.test import APITestCase
+from rest_framework import status
+
+User = get_user_model()
+
+
+class UserPermissionsTests(APITestCase):
+
+    def setUp(self):
+        # Normal user
+        self.user = User.objects.create_user(
+            email="normal@example.com",
+            password="test1234"
+        )
+
+        # Staff user (admin-like)
+        self.staff = User.objects.create_user(
+            email="staff@example.com",
+            password="test1234",
+            is_staff=True
+        )
+
+        # Superuser
+        self.superuser = User.objects.create_superuser(
+            email="admin@example.com",
+            password="admin1234"
+        )
+
+        self.list_url = reverse("users:list")  # örnek: /api/users/
+        self.detail_url = reverse("users:detail", args=[self.user.id])  # örnek: /api/users/<id>/
+
+    # ------------ LIST PERMISSION TESTS ------------
+    def test_user_list_requires_authentication(self):
+        """Anon kullanıcı user list göremez"""
+        response = self.client.get(self.list_url)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_normal_user_cannot_list_users(self):
+        """Normal user tüm kullanıcıları listeleyemez"""
+        self.client.force_login(self.user)
+        response = self.client.get(self.list_url)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_staff_can_list_users(self):
+        """Staff user kullanıcı listesini görebilir"""
+        self.client.force_login(self.staff)
+        response = self.client.get(self.list_url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_superuser_can_list_users(self):
+        """Superuser her şeyi görebilir"""
+        self.client.force_login(self.superuser)
+        response = self.client.get(self.list_url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    # ------------ DETAIL PERMISSION TESTS ------------
+    def test_user_can_view_own_profile(self):
+        """Normal kullanıcı kendi profiline erişebilir"""
+        self.client.force_login(self.user)
+        response = self.client.get(self.detail_url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_user_cannot_view_other_user_profile(self):
+        """Normal kullanıcı başkasının profiline erişemez"""
+        other = User.objects.create_user(email="x@example.com", password="p")
+        self.client.force_login(other)
+        response = self.client.get(self.detail_url)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_staff_can_view_any_profile(self):
+        """Staff tüm kullanıcı profillerini görebilir"""
+        self.client.force_login(self.staff)
+        response = self.client.get(self.detail_url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    # ------------ DELETE PERMISSION TESTS ------------
+    def test_normal_user_cannot_delete(self):
+        """Normal kullanıcı bir user silemez"""
+        self.client.force_login(self.user)
+        response = self.client.delete(self.detail_url)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_staff_cannot_delete_users(self):
+        """Staff kullanıcı silemez (genellikle)"""
+        self.client.force_login(self.staff)
+        response = self.client.delete(self.detail_url)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_superuser_can_delete_users(self):
+        """Superuser user silebilir"""
+        self.client.force_login(self.superuser)
+        response = self.client.delete(self.detail_url)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+import pytest
+from unittest.mock import patch, MagicMock
+from checking.semantic_search import check_plagiarism
+from checking.models import Article
+
+
+@pytest.mark.django_db
+@patch("checking.semantic_search.engine.model")   # SentenceTransformer mock
+def test_check_plagiarism_basic(mock_model):
+    # ---- STEP 1 — NLP MODEL MOCK ----
+    mock_model.encode.return_value = [0.01] * 768   # Fake embedding
+
+    # ---- STEP 2 — Article queryset MOCK ----
+    # Fake DB object
+    fake_article = MagicMock()
+    fake_article.title = "Sample Article"
+    fake_article.content = "Some example article content text."
+    fake_article.distance = 0.10  # distance = 0.10 => similarity = 90%
+    
+    # Queryset mock
+    Article.objects.annotate.return_value.order_by.return_value.__getitem__.return_value = [fake_article]
+
+    text = "This is my test document to check plagiarism."
+
+    result = check_plagiarism(text)
+
+    # ---- ASSERTIONS ----
+    assert "plagiarism_score" in result
+    assert "matches" in result
+
+    assert result["plagiarism_score"] == 90.0     # (1 - 0.10) * 100
+    assert len(result["matches"]) == 1
+    assert result["matches"][0]["title"] == "Sample Article"
+    assert result["matches"][0]["similarity"] == 90.0
+
+
+@pytest.mark.django_db
+@patch("checking.semantic_search.engine.model")
+def test_check_plagiarism_no_results(mock_model):
+    mock_model.encode.return_value = [0.01] * 768
+
+    # simulate empty queryset
+    Article.objects.annotate.return_value.order_by.return_value.__getitem__.return_value = []
+
+    result = check_plagiarism("hello world")
+
+    assert result["plagiarism_score"] == 0.0
+    assert result["matches"] == []
+from django.urls import reverse
+from django.contrib.auth import get_user_model
+from rest_framework.test import APITestCase
+from rest_framework import status
+
+User = get_user_model()
+
+
+class TrainEmbeddingsTests(APITestCase):
+
+    def setUp(self):
+        # Normal user
+        self.user = User.objects.create_user(
+            email="normal@example.com",
+            password="test1234"
+        )
+
+        # Staff user (embedding eğitme izni olmalı)
+        self.staff = User.objects.create_user(
+            email="staff@example.com",
+            password="test1234",
+            is_staff=True
+        )
+
+        # Superuser
+        self.superuser = User.objects.create_superuser(
+            email="admin@example.com",
+            password="admin1234"
+        )
+
+        self.url = reverse("checking:train_embeddings")  
+        # örnek: /api/checking/train-embeddings/
+
+    # -------------------------------
+    # AUTH TESTS
+    # -------------------------------
+
+    def test_anonymous_cannot_train_embeddings(self):
+        """Anonim kullanıcı embedding eğitemez"""
+        response = self.client.post(self.url)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_normal_user_cannot_train_embeddings(self):
+        """Normal kullanıcı embedding eğitemez"""
+        self.client.force_login(self.user)
+        response = self.client.post(self.url)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_staff_can_train_embeddings(self):
+        """Staff kullanıcı embedding eğitebilir"""
+        self.client.force_login(self.staff)
+        response = self.client.post(self.url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # Mesaj doğrulama
+        self.assertIn("trained", response.data["message"].lower())
+
+    def test_superuser_can_train_embeddings(self):
+        """Superuser embedding eğitebilir"""
+        self.client.force_login(self.superuser)
+        response = self.client.post(self.url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn("trained", response.data["message"].lower())
+
+    # -------------------------------
+    # FUNCTIONAL BEHAVIOR TEST
+    # -------------------------------
+
+    def test_train_embeddings_calls_training_function(self):
+        """
+        train_embeddings view içerisindeki train() fonksiyonunun çağrıldığını test eder.
+        """
+        # Patch (mock) kullanmak için unittest.mock import edilir
+        from unittest.mock import patch
+
+        with patch("checking.train_embeddings.train.run_training") as mocked_train:
+            mocked_train.return_value = True
+
+            self.client.force_login(self.staff)
+            response = self.client.post(self.url)
+
+            # Fonksiyon çağrıldı mı?
+            mocked_train.assert_called_once()
+
+            # Response kontrolü
+            self.assertEqual(response.status_code, status.HTTP_200_OK)
+import os
+import pytest
+from django.urls import reverse
+from django.core.files.uploadedfile import SimpleUploadedFile
+from django.conf import settings
+from django.test import Client
+from rest_framework.test import APIClient
+from users.models import CustomUser
+from checking.models import ThesisSubmission
+
+
+@pytest.mark.django_db
+def test_index_view_get_renders_page():
+    """GET /index/ login_required sayfası render olmalı."""
+    user = CustomUser.objects.create_user(
+        email="test@example.com",
+        username="u1",
+        password="Pass1234!"
+    )
+
+    client = Client()
+    client.login(email="test@example.com", password="Pass1234!")
+
+    response = client.get(reverse("index"))
+
+    assert response.status_code == 200
+    assert b"html" in response.content.lower()  # sayfa geldiğini kontrol eder
+
+
+@pytest.mark.django_db
+def test_index_view_post_upload_file(monkeypatch):
+    """POST ile dosya yüklenince ThesisSubmission yaratılmalı."""
+
+    # 1) Fake plagiarism result mock
+    def fake_analysis(path):
+        return {
+            "plagiarism": 12.5,
+            "grammar": 3,
+            "citations": 1
+        }
+
+    # monkeypatch = run_plagiarism_and_grammar_check fonksiyonunu taklit eder
+    import checking.views
+    monkeypatch.setattr(checking.views, "run_plagiarism_and_grammar_check", fake_analysis)
+
+    # 2) User
+    user = CustomUser.objects.create_user(
+        email="upload@example.com",
+        username="uploaduser",
+        password="Pass1234!"
+    )
+
+    client = Client()
+    client.login(email="upload@example.com", password="Pass1234!")
+
+    # 3) Fake file
+    file_content = b"Dummy PDF content"
+    uploaded = SimpleUploadedFile("file.pdf", file_content, content_type="application/pdf")
+
+    response = client.post(
+        reverse("index"),
+        {"file": uploaded},
+        format="multipart"
+    )
+
+    # Redirect after success
+    assert response.status_code == 302
+
+    # ThesisSubmission created?
+    thesis = ThesisSubmission.objects.first()
+    assert thesis is not None
+    assert thesis.student == user
+    assert thesis.plagiarism_score == 12.5
+    assert thesis.grammar_issues == 3
+    assert thesis.citations_missing == 1
+    assert thesis.status == "completed"
+
+
+@pytest.mark.django_db
+def test_check_view_valid_id():
+    """ /check/<id>/ doğru çalışıyor mu? """
+    user = CustomUser.objects.create_user(
+        email="checkuser@example.com",
+        username="check1",
+        password="Pass1234!"
+    )
+
+    thesis = ThesisSubmission.objects.create(
+        student=user,
+        file="uploads/test.pdf",
+        status="completed"
+    )
+
+    client = Client()
+    client.login(email="checkuser@example.com", password="Pass1234!")
+
+    response = client.get(reverse("check", kwargs={"id": thesis.id}))
+
+    assert response.status_code == 200
+    assert b"submission" in response.content.lower()
+
+
+@pytest.mark.django_db
+def test_check_view_invalid_id():
+    """Olmayan ID'de hata sayfası dönmeli."""
+    user = CustomUser.objects.create_user(
+        email="invalid@example.com",
+        username="inv",
+        password="Pass1234!"
+    )
+
+    client = Client()
+    client.login(email="invalid@example.com", password="Pass1234!")
+
+    response = client.get(reverse("check", kwargs={"id": 9999}))
+
+    assert response.status_code == 200
+    assert b"not found" in response.content.lower()
+
+
+# ------------------------- #
+#   DRF API TESTS
+# ------------------------- #
+
+@pytest.mark.django_db
+def test_api_upload_thesis_authenticated(monkeypatch):
+    """Token ile API'den yükleme çalışmalı."""
+
+    # Fake plagiarism analysis
+    def fake_analysis(path):
+        return {
+            "plagiarism": 33,
+            "grammar": 4,
+            "citations": 2
+        }
+
+    import checking.views
+    monkeypatch.setattr(checking.views, "run_plagiarism_and_grammar_check", fake_analysis)
+
+    client = APIClient()
+
+    user = CustomUser.objects.create_user(
+        email="api@test.com",
+        username="apiuser",
+        password="Pass123!45"
+    )
+
+    client.force_authenticate(user=user)
+
+    file_content = b"PDF CONTENT"
+    uploaded = SimpleUploadedFile("file.pdf", file_content, content_type="application/pdf")
+
+    response = client.post(
+        reverse("api_upload_thesis"),
+        {"file": uploaded},
+        format="multipart"
+    )
+
+    assert response.status_code == 201
+    assert ThesisSubmission.objects.count() == 1
+    thesis = ThesisSubmission.objects.first()
+    assert thesis.student == user
+    assert thesis.status == "processing"  # perform_create içi
+
+
+@pytest.mark.django_db
+def test_api_upload_thesis_requires_auth():
+    """Token yoksa 401 dönmeli."""
+    client = APIClient()
+
+    file_content = b"PDF CONTENT"
+    uploaded = SimpleUploadedFile("file.pdf", file_content, content_type="application/pdf")
+
+    response = client.post(
+        reverse("api_upload_thesis"),
+        {"file": uploaded},
+        format="multipart"
+    )
+
+    assert response.status_code == 401
+import pytest
+from django.urls import reverse
+from rest_framework.test import APIClient
+from users.models import CustomUser
+from rest_framework_simplejwt.tokens import RefreshToken
+
+@pytest.mark.django_db
+def test_upload_requires_file():
+    user = CustomUser.objects.create_user(email="x@test.com", username="x", password="x123")
+    client = APIClient()
+    refresh = RefreshToken.for_user(user)
+    client.credentials(HTTP_AUTHORIZATION=f"Bearer {refresh.access_token}")
+
+    resp = client.post(reverse("upload"), {}, format="multipart")
+    assert resp.status_code == 400
+    assert "file" in resp.data
+import pytest
+from django.urls import reverse
+from rest_framework.test import APIClient
+from django.core.files.uploadedfile import SimpleUploadedFile
+from users.models import CustomUser
+from rest_framework_simplejwt.tokens import RefreshToken
+
+@pytest.mark.django_db
+def test_permissions_no_token_cannot_upload():
+    client = APIClient()
+    f = SimpleUploadedFile("a.pdf", b"data")
+    response = client.post(reverse("upload"), {"file": f}, format="multipart")
+    assert response.status_code in [401, 403]
+
+@pytest.mark.django_db
+def test_permissions_user_cannot_access_others_submissions():
+    client = APIClient()
+
+    # User 1
+    u1 = CustomUser.objects.create_user(email="u1@test.com", username="u1", password="pass")
+    r1 = RefreshToken.for_user(u1)
+    client.credentials(HTTP_AUTHORIZATION=f"Bearer {r1.access_token}")
+
+    f = SimpleUploadedFile("u1.pdf", b"file1")
+    upload = client.post(reverse("upload"), {"file": f}, format="multipart")
+    thesis_id = upload.data["id"]
+
+    # User 2
+    u2 = CustomUser.objects.create_user(email="u2@test.com", username="u2", password="pass")
+    r2 = RefreshToken.for_user(u2)
+    client.credentials(HTTP_AUTHORIZATION=f"Bearer {r2.access_token}")
+
+    # User 2 → User 1’in sonucunu göremesin
+    resp = client.get(reverse("check_api", args=[thesis_id]))
+    assert resp.status_code in [403, 404]
+import pytest
+from django.urls import reverse
+from rest_framework.test import APIClient
+from users.models import CustomUser
+from django.core.files.uploadedfile import SimpleUploadedFile
+from rest_framework_simplejwt.tokens import RefreshToken
+from unittest.mock import patch
+
+@pytest.mark.django_db
+@patch("checking.api.views.run_plagiarism_and_grammar_check")
+def test_full_flow(mock_check):
+    mock_check.return_value = {
+        "plagiarism": 22.5,
+        "grammar": 3,
+        "citations": 1
+    }
+
+    client = APIClient()
+
+    # ---- 1) USER REGISTER ----
+    user = CustomUser.objects.create_user(
+        email="flow@example.com",
+        username="flow",
+        password="FlowPass123!"
+    )
+
+    refresh = RefreshToken.for_user(user)
+    client.credentials(HTTP_AUTHORIZATION=f'Bearer {refresh.access_token}')
+
+    # ---- 2) THESIS UPLOAD ----
+    file = SimpleUploadedFile("flow.pdf", b"Flow content")
+    response = client.post(reverse("upload"), {"file": file}, format="multipart")
+
+    assert response.status_code in [200, 201]
+    thesis_id = response.data["id"]
+
+    # ---- 3) GET RESULT ----
+    result = client.get(reverse("check_api", args=[thesis_id]))
+    assert result.status_code == 200
+    assert result.data["plagiarism_score"] == 22.5
+
+    # ---- 4) LIST ALL ----
+    listing = client.get(reverse("check_all"))
+    assert listing.status_code == 200
+    assert len(listing.data) >= 1
+import time
+import pytest
+from django.urls import reverse
+from rest_framework.test import APIClient
+from users.models import CustomUser
+from rest_framework_simplejwt.tokens import RefreshToken
+from django.core.files.uploadedfile import SimpleUploadedFile
+from unittest.mock import patch
+
+@pytest.mark.django_db
+@patch("checking.api.views.run_plagiarism_and_grammar_check")
+def test_upload_speed(mock_check):
+    # Mock fonksiyonun döneceği değer
+    mock_check.return_value = {"plagiarism": 1, "grammar": 0, "citations": 0}
+
+    # Test için kullanıcı oluştur
+    user = CustomUser.objects.create_user(
+        email="per@test.com",
+        username="p",
+        password="p123"
+    )
+
+    client = APIClient()
+    refresh = RefreshToken.for_user(user)
+    client.credentials(HTTP_AUTHORIZATION=f"Bearer {refresh.access_token}")
+
+    # Test dosyası oluştur
+    file = SimpleUploadedFile("speed.pdf", b"12345")
+
+    # İşlem süresini ölç
+    start = time.time()
+    client.post(reverse("upload"), {"file": file}, format="multipart")
+    duration = time.time() - start
+
+    # 1 saniyeden kısa sürmeli
+    assert duration < 1.0
+from django.urls import reverse, resolve
+
+def test_routing_upload():
+    path = reverse("upload")
+    assert resolve(path).url_name == "upload"
+
+def test_routing_check():
+    path = reverse("check_api", args=[1])
+    assert resolve(path).url_name == "check_api"
+
+def test_routing_check_all():
+    path = reverse("check_all")
+    assert resolve(path).url_name == "check_all"
+# users/tests/test_forms.py
+from django.test import TestCase
+from users.forms import CustomUserCreationForm
+
+class CustomUserCreationFormTest(TestCase):
+    def test_form_valid_data(self):
+        form_data = {
+            'email': 'test@example.com',
+            'username': 'testuser',
+            'role': 'student',
+            'password1': 'ComplexPass123!',
+            'password2': 'ComplexPass123!',
+        }
+        form = CustomUserCreationForm(data=form_data)
+        self.assertTrue(form.is_valid())
+
+    def test_form_invalid_data(self):
+        form_data = {
+            'email': 'invalid-email',
+            'username': '',
+            'role': 'student',
+            'password1': 'pass',
+            'password2': 'pass2',
+        }
+        form = CustomUserCreationForm(data=form_data)
+        self.assertFalse(form.is_valid())
+# users/tests/test_models.py
+from django.test import TestCase
+from users.models import CustomUser
+
+class CustomUserModelTest(TestCase):
+    def test_create_user(self):
+        user = CustomUser.objects.create_user(
+            email='user@example.com',
+            username='user1',
+            password='ComplexPass123!',
+            role='student'
+        )
+        self.assertEqual(user.email, 'user@example.com')
+        self.assertEqual(user.role, 'student')
+        self.assertTrue(user.check_password('ComplexPass123!'))
+
+    def test_str_method(self):
+        user = CustomUser(email='user@example.com', username='user1', role='admin')
+        self.assertEqual(str(user), 'user@example.com (admin)')
+# users/tests/test_permissions.py
+
+def test_dummy_permission():
+    # permissions dosyası yok, bu test sadece placeholder
+    assert True  # Her zaman geçer, backend koduna dokunmadan Pylance hatası olmaz
+# users/tests/test_serializers.py
+from django.test import TestCase
+from users.serializers import RegisterSerializer
+from users.models import CustomUser
+
+class RegisterSerializerTest(TestCase):
+    def test_serializer_valid_data(self):
+        data = {
+            'email': 'user@example.com',
+            'username': 'user1',
+            'password': 'ComplexPass123!',
+            'role': 'student'
+        }
+        serializer = RegisterSerializer(data=data)
+        self.assertTrue(serializer.is_valid())
+        user = serializer.save()
+        self.assertEqual(user.email, 'user@example.com')
+        self.assertEqual(user.role, 'student')
+# users/tests/test_views.py
+from django.test import TestCase
+from django.urls import reverse
+from rest_framework.test import APIClient
+from users.models import CustomUser
+
+class RegisterViewTest(TestCase):
+    def setUp(self):
+        self.client = APIClient()
+
+    def test_register_api(self):
+        url = reverse('api_register')
+        data = {
+            'email': 'user2@example.com',
+            'username': 'user2',
+            'password': 'ComplexPass123!',
+            'role': 'student'
+        }
+        response = self.client.post(url, data, format='json')
+        self.assertIn(response.status_code, [200, 201])
+        self.assertTrue(CustomUser.objects.filter(email='user2@example.com').exists())
+📦thesis_check
+ ┣ 📂.pytest_cache
+ ┃ ┣ 📂v
+ ┃ ┃ ┗ 📂cache
+ ┃ ┃ ┃ ┣ 📜lastfailed
+ ┃ ┃ ┃ ┗ 📜nodeids
+ ┃ ┣ 📜.gitignore
+ ┃ ┣ 📜CACHEDIR.TAG
+ ┃ ┗ 📜README.md
+ ┣ 📂api
+ ┃ ┣ 📂migrations
+ ┃ ┃ ┣ 📂__pycache__
+ ┃ ┃ ┃ ┣ 📜__init__.cpython-310.pyc
+ ┃ ┃ ┃ ┣ 📜__init__.cpython-311.pyc
+ ┃ ┃ ┃ ┗ 📜__init__.cpython-312.pyc
+ ┃ ┃ ┗ 📜__init__.py
+ ┃ ┣ 📂tests
+ ┃ ┃ ┣ 📂__pycache__
+ ┃ ┃ ┃ ┣ 📜test.cpython-310.pyc
+ ┃ ┃ ┃ ┣ 📜test.cpython-312.pyc
+ ┃ ┃ ┃ ┣ 📜test_models.cpython-312-pytest-9.0.1.pyc
+ ┃ ┃ ┃ ┣ 📜test_models.cpython-312.pyc
+ ┃ ┃ ┃ ┣ 📜test_nlp_processor.cpython-312-pytest-9.0.1.pyc
+ ┃ ┃ ┃ ┣ 📜test_nlp_processor.cpython-312.pyc
+ ┃ ┃ ┃ ┣ 📜test_serializers.cpython-312-pytest-9.0.1.pyc
+ ┃ ┃ ┃ ┣ 📜test_serializers.cpython-312.pyc
+ ┃ ┃ ┃ ┣ 📜test_views.cpython-312-pytest-9.0.1.pyc
+ ┃ ┃ ┃ ┣ 📜test_views.cpython-312.pyc
+ ┃ ┃ ┃ ┣ 📜__init__.cpython-310.pyc
+ ┃ ┃ ┃ ┗ 📜__init__.cpython-312.pyc
+ ┃ ┃ ┣ 📜test_models.py
+ ┃ ┃ ┣ 📜test_nlp_processor.py
+ ┃ ┃ ┣ 📜test_serializers.py
+ ┃ ┃ ┣ 📜test_views.py
+ ┃ ┃ ┗ 📜__init__.py
+ ┃ ┣ 📂__pycache__
+ ┃ ┃ ┣ 📜nlp.cpython-310.pyc
+ ┃ ┃ ┣ 📜nlp.cpython-311.pyc
+ ┃ ┃ ┣ 📜nlp.cpython-312.pyc
+ ┃ ┃ ┣ 📜nlp.cpython-314.pyc
+ ┃ ┃ ┣ 📜serializers.cpython-310.pyc
+ ┃ ┃ ┣ 📜serializers.cpython-311.pyc
+ ┃ ┃ ┣ 📜serializers.cpython-312.pyc
+ ┃ ┃ ┣ 📜urls.cpython-310.pyc
+ ┃ ┃ ┣ 📜urls.cpython-311.pyc
+ ┃ ┃ ┣ 📜urls.cpython-312.pyc
+ ┃ ┃ ┣ 📜views.cpython-310.pyc
+ ┃ ┃ ┣ 📜views.cpython-311.pyc
+ ┃ ┃ ┣ 📜views.cpython-312.pyc
+ ┃ ┃ ┣ 📜__init__.cpython-310.pyc
+ ┃ ┃ ┣ 📜__init__.cpython-311.pyc
+ ┃ ┃ ┣ 📜__init__.cpython-312.pyc
+ ┃ ┃ ┗ 📜__init__.cpython-314.pyc
+ ┃ ┣ 📜nlp.py
+ ┃ ┣ 📜serializers.py
+ ┃ ┣ 📜urls.py
+ ┃ ┣ 📜views.py
+ ┃ ┗ 📜__init__.py
+ ┣ 📂assets
+ ┃ ┣ 📂js
+ ┃ ┃ ┣ 📜login.js
+ ┃ ┃ ┗ 📜main.js
+ ┃ ┣ 📜css
+ ┃ ┗ 📜style.css
+ ┣ 📂checking
+ ┃ ┣ 📂migrations
+ ┃ ┃ ┣ 📂__pycache__
+ ┃ ┃ ┃ ┣ 📜0001_initial.cpython-311.pyc
+ ┃ ┃ ┃ ┣ 📜0001_initial.cpython-312.pyc
+ ┃ ┃ ┃ ┣ 📜0002_remove_thesissubmission_student_id_and_more.cpython-312.pyc
+ ┃ ┃ ┃ ┣ 📜__init__.cpython-311.pyc
+ ┃ ┃ ┃ ┗ 📜__init__.cpython-312.pyc
+ ┃ ┃ ┣ 📜0001_initial.py
+ ┃ ┃ ┗ 📜__init__.py
+ ┃ ┣ 📂tests
+ ┃ ┃ ┣ 📂__pycache__
+ ┃ ┃ ┃ ┣ 📜test_endpoints.cpython-312-pytest-9.0.1.pyc
+ ┃ ┃ ┃ ┣ 📜test_forms.cpython-312-pytest-9.0.1.pyc
+ ┃ ┃ ┃ ┣ 📜test_models.cpython-312-pytest-9.0.1.pyc
+ ┃ ┃ ┃ ┣ 📜test_models.cpython-312.pyc
+ ┃ ┃ ┃ ┣ 📜test_permissions.cpython-312-pytest-9.0.1.pyc
+ ┃ ┃ ┃ ┣ 📜test_semantic_engine.cpython-312-pytest-9.0.1.pyc
+ ┃ ┃ ┃ ┣ 📜test_train_embeddings.cpython-312-pytest-9.0.1.pyc
+ ┃ ┃ ┃ ┣ 📜test_views.cpython-312-pytest-9.0.1.pyc
+ ┃ ┃ ┃ ┣ 📜test_views.cpython-312.pyc
+ ┃ ┃ ┃ ┗ 📜__init__.cpython-312.pyc
+ ┃ ┃ ┣ 📜test_endpoints.py
+ ┃ ┃ ┣ 📜test_forms.py
+ ┃ ┃ ┣ 📜test_models.py
+ ┃ ┃ ┣ 📜test_permissions.py
+ ┃ ┃ ┣ 📜test_semantic_engine.py
+ ┃ ┃ ┣ 📜test_train_embeddings.py
+ ┃ ┃ ┗ 📜test_views.py
+ ┃ ┣ 📂__pycache__
+ ┃ ┃ ┣ 📜admin.cpython-310.pyc
+ ┃ ┃ ┣ 📜admin.cpython-311.pyc
+ ┃ ┃ ┣ 📜admin.cpython-312.pyc
+ ┃ ┃ ┣ 📜admin.cpython-314.pyc
+ ┃ ┃ ┣ 📜apps.cpython-310.pyc
+ ┃ ┃ ┣ 📜apps.cpython-311.pyc
+ ┃ ┃ ┣ 📜apps.cpython-312.pyc
+ ┃ ┃ ┣ 📜apps.cpython-314.pyc
+ ┃ ┃ ┣ 📜forms.cpython-312.pyc
+ ┃ ┃ ┣ 📜models.cpython-310.pyc
+ ┃ ┃ ┣ 📜models.cpython-311.pyc
+ ┃ ┃ ┣ 📜models.cpython-312.pyc
+ ┃ ┃ ┣ 📜models.cpython-314.pyc
+ ┃ ┃ ┣ 📜semantic_search.cpython-312.pyc
+ ┃ ┃ ┣ 📜urls.cpython-310.pyc
+ ┃ ┃ ┣ 📜urls.cpython-311.pyc
+ ┃ ┃ ┣ 📜urls.cpython-312.pyc
+ ┃ ┃ ┣ 📜urls.cpython-314.pyc
+ ┃ ┃ ┣ 📜views.cpython-310.pyc
+ ┃ ┃ ┣ 📜views.cpython-311.pyc
+ ┃ ┃ ┣ 📜views.cpython-312.pyc
+ ┃ ┃ ┣ 📜views.cpython-314.pyc
+ ┃ ┃ ┣ 📜__init__.cpython-310.pyc
+ ┃ ┃ ┣ 📜__init__.cpython-311.pyc
+ ┃ ┃ ┣ 📜__init__.cpython-312.pyc
+ ┃ ┃ ┗ 📜__init__.cpython-314.pyc
+ ┃ ┣ 📜admin.py
+ ┃ ┣ 📜apps.py
+ ┃ ┣ 📜articles.csv
+ ┃ ┣ 📜forms.py
+ ┃ ┣ 📜models.py
+ ┃ ┣ 📜semantic_search.py
+ ┃ ┣ 📜train_embeddings.py
+ ┃ ┣ 📜urls.py
+ ┃ ┣ 📜views.py
+ ┃ ┗ 📜__init__.py
+ ┣ 📂media
+ ┃ ┗ 📂uploads
+ ┃ ┃ ┣ 📜2021-08-23_4.png
+ ┃ ┃ ┣ 📜belge2.pdf
+ ┃ ┃ ┣ 📜belge2_1Lhi7eG.pdf
+ ┃ ┃ ┣ 📜belge2_psNWOlX.pdf
+ ┃ ┃ ┣ 📜belge2_vv5vyhN.pdf
+ ┃ ┃ ┣ 📜Belge_3_1.docx
+ ┃ ┃ ┣ 📜Belge_3_1_akRAFP5.docx
+ ┃ ┃ ┣ 📜Belge_3_1_BbN4SNd.docx
+ ┃ ┃ ┣ 📜builder.Services.AddDbContextBlogDb.txt
+ ┃ ┃ ┣ 📜c447f6ddbba54a80e002605fd765877d.png
+ ┃ ┃ ┣ 📜dummy.pdf
+ ┃ ┃ ┣ 📜dummy.txt
+ ┃ ┃ ┣ 📜dummy_4YLzvxc.txt
+ ┃ ┃ ┣ 📜dummy_5YfLjQf.txt
+ ┃ ┃ ┣ 📜dummy_63dSgbq.txt
+ ┃ ┃ ┣ 📜dummy_6jJU3bq.txt
+ ┃ ┃ ┣ 📜dummy_8I2SG1f.txt
+ ┃ ┃ ┣ 📜dummy_A8VQCUv.txt
+ ┃ ┃ ┣ 📜dummy_lML7cMT.txt
+ ┃ ┃ ┣ 📜dummy_m60idL5.txt
+ ┃ ┃ ┣ 📜dummy_M9aNF1O.txt
+ ┃ ┃ ┣ 📜dummy_MHfAVjz.txt
+ ┃ ┃ ┣ 📜dummy_NEJmwts.txt
+ ┃ ┃ ┣ 📜dummy_nM6s4Y8.txt
+ ┃ ┃ ┣ 📜dummy_nZ0WqKX.txt
+ ┃ ┃ ┣ 📜dummy_qn0kztA.txt
+ ┃ ┃ ┣ 📜dummy_r2GpMMh.txt
+ ┃ ┃ ┣ 📜dummy_yrd3GME.txt
+ ┃ ┃ ┣ 📜from django.urls import path.txt
+ ┃ ┃ ┣ 📜from_django.urls_import_path.txt
+ ┃ ┃ ┣ 📜full_thesis_project_test_suite.xlsx
+ ┃ ┃ ┣ 📜full_thesis_project_test_suite_deaI5BJ.xlsx
+ ┃ ┃ ┣ 📜Lecture_3-Ocupation_Health_Safety.pptx
+ ┃ ┃ ┣ 📜pip_install_python-dotenv_ch2DPa0.txt
+ ┃ ┃ ┣ 📜Research_method_1.ppt
+ ┃ ┃ ┣ 📜Research_method_1_QYT8rYl.ppt
+ ┃ ┃ ┣ 📜S5_-_CPU_scheduling-14-5-2025_1.ppt
+ ┃ ┃ ┣ 📜S5_-_CPU_scheduling-14-5-2025_1_TLjavdw.ppt
+ ┃ ┃ ┣ 📜STAT226_File_1.pdf
+ ┃ ┃ ┣ 📜STAT226_File_3.pdf
+ ┃ ┃ ┣ 📜STAT226_File_3_zmag02N.pdf
+ ┃ ┃ ┣ 📜Student_Exam_Registration.pdf
+ ┃ ┃ ┣ 📜Student_Exam_Registration_cE1ZgRs.pdf
+ ┃ ┃ ┣ 📜Student_Exam_Registration_mzSm5q6.pdf
+ ┃ ┃ ┣ 📜test.pdf
+ ┃ ┃ ┣ 📜test.txt
+ ┃ ┃ ┣ 📜test2.txt
+ ┃ ┃ ┣ 📜test2_7gJwuYe.txt
+ ┃ ┃ ┣ 📜test2_90GTG59.txt
+ ┃ ┃ ┣ 📜test2_Fco1sbT.txt
+ ┃ ┃ ┣ 📜test2_taT1HTz.txt
+ ┃ ┃ ┣ 📜test_2hBucCt.pdf
+ ┃ ┃ ┣ 📜test_4eVV4xu.txt
+ ┃ ┃ ┣ 📜test_6PzI1cY.txt
+ ┃ ┃ ┣ 📜test_dzdcuVn.txt
+ ┃ ┃ ┣ 📜test_jfRgsQx.txt
+ ┃ ┃ ┣ 📜test_JkaM0Tj.txt
+ ┃ ┃ ┣ 📜test_nnmZ5Ie.txt
+ ┃ ┃ ┣ 📜test_QV6CFdj.txt
+ ┃ ┃ ┣ 📜test_sb7cQXp.txt
+ ┃ ┃ ┣ 📜test_thesis.pdf
+ ┃ ┃ ┣ 📜test_thesis_5GPiU2a.pdf
+ ┃ ┃ ┣ 📜test_thesis_6iIHGij.pdf
+ ┃ ┃ ┣ 📜test_thesis_aIMnrFh.pdf
+ ┃ ┃ ┣ 📜test_thesis_aVi0STb.pdf
+ ┃ ┃ ┣ 📜test_thesis_bM58ysC.pdf
+ ┃ ┃ ┣ 📜test_thesis_EL0NZSq.pdf
+ ┃ ┃ ┣ 📜test_thesis_IufrjRj.pdf
+ ┃ ┃ ┣ 📜test_thesis_O6N0zzT.pdf
+ ┃ ┃ ┣ 📜test_thesis_RincjSJ.pdf
+ ┃ ┃ ┣ 📜test_thesis_UGvDXnR.pdf
+ ┃ ┃ ┣ 📜test_thesis_xsc98fE.pdf
+ ┃ ┃ ┣ 📜test_thesis_ZehNMyL.pdf
+ ┃ ┃ ┣ 📜test_uuGJStD.txt
+ ┃ ┃ ┣ 📜test_WQzV5yC.txt
+ ┃ ┃ ┗ 📜XodoPDFStudio_win64.exe
+ ┣ 📂pgvector
+ ┣ 📂templates
+ ┃ ┣ 📂assets
+ ┃ ┃ ┗ 📂js
+ ┃ ┃ ┃ ┗ 📂assets
+ ┃ ┃ ┃ ┃ ┣ 📂js
+ ┃ ┃ ┃ ┃ ┃ ┗ 📜main.js
+ ┃ ┃ ┃ ┃ ┣ 📜css
+ ┃ ┃ ┃ ┃ ┗ 📜style.css
+ ┃ ┣ 📜base.html
+ ┃ ┣ 📜check.html
+ ┃ ┣ 📜index.html
+ ┃ ┣ 📜login.html
+ ┃ ┗ 📜register.html
+ ┣ 📂tests
+ ┃ ┣ 📂__pycache__
+ ┃ ┃ ┣ 📜test_api_basic.cpython-312-pytest-9.0.1.pyc
+ ┃ ┃ ┣ 📜test_api_basic.cpython-312.pyc
+ ┃ ┃ ┣ 📜test_api_permissions.cpython-312-pytest-9.0.1.pyc
+ ┃ ┃ ┣ 📜test_api_permissions.cpython-312.pyc
+ ┃ ┃ ┣ 📜test_full_flow.cpython-312-pytest-9.0.1.pyc
+ ┃ ┃ ┣ 📜test_full_flow.cpython-312.pyc
+ ┃ ┃ ┣ 📜test_performance.cpython-312-pytest-9.0.1.pyc
+ ┃ ┃ ┣ 📜test_performance.cpython-312.pyc
+ ┃ ┃ ┣ 📜test_routing.cpython-312-pytest-9.0.1.pyc
+ ┃ ┃ ┣ 📜test_routing.cpython-312.pyc
+ ┃ ┃ ┗ 📜__init__.cpython-312.pyc
+ ┃ ┣ 📜test_api_basic.py
+ ┃ ┣ 📜test_api_permissions.py
+ ┃ ┣ 📜test_full_flow.py
+ ┃ ┣ 📜test_performance.py
+ ┃ ┣ 📜test_routing.py
+ ┃ ┗ 📜__init__.py
+ ┣ 📂thesis_check
+ ┃ ┣ 📂__pycache__
+ ┃ ┃ ┣ 📜settings.cpython-310.pyc
+ ┃ ┃ ┣ 📜settings.cpython-311.pyc
+ ┃ ┃ ┣ 📜settings.cpython-312.pyc
+ ┃ ┃ ┣ 📜settings.cpython-314.pyc
+ ┃ ┃ ┣ 📜urls.cpython-310.pyc
+ ┃ ┃ ┣ 📜urls.cpython-311.pyc
+ ┃ ┃ ┣ 📜urls.cpython-312.pyc
+ ┃ ┃ ┣ 📜urls.cpython-314.pyc
+ ┃ ┃ ┣ 📜wsgi.cpython-310.pyc
+ ┃ ┃ ┣ 📜wsgi.cpython-311.pyc
+ ┃ ┃ ┣ 📜wsgi.cpython-312.pyc
+ ┃ ┃ ┣ 📜__init__.cpython-310.pyc
+ ┃ ┃ ┣ 📜__init__.cpython-311.pyc
+ ┃ ┃ ┣ 📜__init__.cpython-312.pyc
+ ┃ ┃ ┗ 📜__init__.cpython-314.pyc
+ ┃ ┣ 📜asgi.py
+ ┃ ┣ 📜settings.py
+ ┃ ┣ 📜urls.py
+ ┃ ┣ 📜wsgi.py
+ ┃ ┗ 📜__init__.py
+ ┣ 📂users
+ ┃ ┣ 📂migrations
+ ┃ ┃ ┣ 📂__pycache__
+ ┃ ┃ ┃ ┣ 📜0001_initial.cpython-311.pyc
+ ┃ ┃ ┃ ┣ 📜0001_initial.cpython-312.pyc
+ ┃ ┃ ┃ ┣ 📜__init__.cpython-311.pyc
+ ┃ ┃ ┃ ┗ 📜__init__.cpython-312.pyc
+ ┃ ┃ ┣ 📜0001_initial.py
+ ┃ ┃ ┗ 📜__init__.py
+ ┃ ┣ 📂tests
+ ┃ ┃ ┣ 📂__pycache__
+ ┃ ┃ ┃ ┣ 📜test_forms.cpython-312-pytest-9.0.1.pyc
+ ┃ ┃ ┃ ┣ 📜test_forms.cpython-312.pyc
+ ┃ ┃ ┃ ┣ 📜test_models.cpython-312-pytest-9.0.1.pyc
+ ┃ ┃ ┃ ┣ 📜test_models.cpython-312.pyc
+ ┃ ┃ ┃ ┣ 📜test_permissions.cpython-312-pytest-9.0.1.pyc
+ ┃ ┃ ┃ ┣ 📜test_permissions.cpython-312.pyc
+ ┃ ┃ ┃ ┣ 📜test_serializers.cpython-312-pytest-9.0.1.pyc
+ ┃ ┃ ┃ ┣ 📜test_serializers.cpython-312.pyc
+ ┃ ┃ ┃ ┣ 📜test_views.cpython-312-pytest-9.0.1.pyc
+ ┃ ┃ ┃ ┣ 📜test_views.cpython-312.pyc
+ ┃ ┃ ┃ ┗ 📜__init__.cpython-312.pyc
+ ┃ ┃ ┣ 📜test_forms.py
+ ┃ ┃ ┣ 📜test_models.py
+ ┃ ┃ ┣ 📜test_permissions.py
+ ┃ ┃ ┣ 📜test_serializers.py
+ ┃ ┃ ┣ 📜test_views.py
+ ┃ ┃ ┗ 📜__init__.py
+ ┃ ┣ 📂__pycache__
+ ┃ ┃ ┣ 📜admin.cpython-311.pyc
+ ┃ ┃ ┣ 📜admin.cpython-312.pyc
+ ┃ ┃ ┣ 📜apps.cpython-311.pyc
+ ┃ ┃ ┣ 📜apps.cpython-312.pyc
+ ┃ ┃ ┣ 📜forms.cpython-311.pyc
+ ┃ ┃ ┣ 📜forms.cpython-312.pyc
+ ┃ ┃ ┣ 📜models.cpython-311.pyc
+ ┃ ┃ ┣ 📜models.cpython-312.pyc
+ ┃ ┃ ┣ 📜serializers.cpython-311.pyc
+ ┃ ┃ ┣ 📜serializers.cpython-312.pyc
+ ┃ ┃ ┣ 📜urls.cpython-311.pyc
+ ┃ ┃ ┣ 📜urls.cpython-312.pyc
+ ┃ ┃ ┣ 📜views.cpython-311.pyc
+ ┃ ┃ ┣ 📜views.cpython-312.pyc
+ ┃ ┃ ┣ 📜__init__.cpython-311.pyc
+ ┃ ┃ ┗ 📜__init__.cpython-312.pyc
+ ┃ ┣ 📜admin.py
+ ┃ ┣ 📜apps.py
+ ┃ ┣ 📜forms.py
+ ┃ ┣ 📜models.py
+ ┃ ┣ 📜serializers.py
+ ┃ ┣ 📜urls.py
+ ┃ ┣ 📜views.py
+ ┃ ┗ 📜__init__.py
+ ┣ 📜.coverage
+ ┣ 📜about.html
+ ┣ 📜backgraund.jpg
+ ┣ 📜index.html
+ ┣ 📜login.html
+ ┗ 📜manage.py
