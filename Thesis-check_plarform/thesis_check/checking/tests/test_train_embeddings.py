@@ -36,7 +36,7 @@ class TrainEmbeddingsTests(APITestCase):
 
     def test_anonymous_cannot_train_embeddings(self):
         response = self.client.post(self.url)
-        # Anonymous kullanıcı artık 403 dönecek DRF izinleri nedeniyle
+        # Anonymous kullanıcı DRF izinleri nedeniyle 403 almalı
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_normal_user_cannot_train_embeddings(self):
