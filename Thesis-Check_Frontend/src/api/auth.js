@@ -1,13 +1,12 @@
 import api from "./client";
 
 export const login = async (email, password) => {
-  // Django: /api/v1/token/
   const res = await api.post("/token/", { email, password });
 
   localStorage.setItem("access", res.data.access);
   localStorage.setItem("refresh", res.data.refresh);
 
-  return res.data; // may include user
+  return res.data;
 };
 
 export const register = async (email, username, password) => {
@@ -16,7 +15,7 @@ export const register = async (email, username, password) => {
   localStorage.setItem("access", res.data.access);
   localStorage.setItem("refresh", res.data.refresh);
 
-  return res.data; // содержит user + токены
+  return res.data;
 };
 
 export const logout = () => {

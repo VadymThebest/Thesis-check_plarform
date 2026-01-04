@@ -1,19 +1,17 @@
-/* GENEL RESET */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
-/* SAYFA GENELİ */
+
 body {
     min-height: 100vh;
-    background: #021633; /* koyu lacivert */
-    color: #f8f1e4;      /* açık krem */
+    background: #021633;
+    color: #f8f1e4;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
-/* NAVBAR */
 .navbar {
     padding: 24px 64px 0 64px;
 }
@@ -49,7 +47,6 @@ body {
     font-weight: 600;
 }
 
-/* HERO BÖLÜMÜ */
 .hero {
     display: flex;
     justify-content: center;
@@ -62,7 +59,6 @@ body {
     max-width: 900px;
 }
 
-/* Başlık serif font havası */
 .hero-title {
     font-family: "Georgia", "Times New Roman", serif;
     font-size: 72px;
@@ -71,7 +67,6 @@ body {
     margin-bottom: 32px;
 }
 
-/* Alt metin */
 .hero-subtitle {
     font-family: "Georgia", "Times New Roman", serif;
     font-size: 24px;
@@ -80,7 +75,6 @@ body {
     margin-bottom: 48px;
 }
 
-/* Buton */
 .hero-button {
     padding: 18px 48px;
     border-radius: 6px;
@@ -88,10 +82,9 @@ body {
     font-size: 18px;
     font-weight: 500;
     cursor: pointer;
-    background-color: #d5a544; /* gold */
+    background-color: #d5a544;
     color: #021633;
 }
-/* ABOUT SAYFASI */
 
 .about {
     padding: 80px 64px 120px 64px;
@@ -120,14 +113,12 @@ body {
     margin-bottom: 60px;
 }
 
-/* Kart alanı */
 .about-cards {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 32px;
 }
 
-/* Kartın kendisi */
 .about-card {
     background: linear-gradient(to bottom, #032248, #0850a3);
     border-radius: 18px;
@@ -136,13 +127,11 @@ body {
     color: #f8f1e4;
 }
 
-/* Kart içindeki ikon */
 .about-card-icon {
     font-size: 40px;
     margin-bottom: 24px;
 }
 
-/* Kart başlığı */
 .about-card-title {
     font-family: "Georgia", "Times New Roman", serif;
     font-size: 24px;
@@ -150,14 +139,11 @@ body {
     margin-bottom: 16px;
 }
 
-/* Kart açıklaması */
 .about-card-text {
     font-size: 16px;
     line-height: 1.6;
     color: #d8d4c8;
 }
-/* CONTACT SAYFASI */
-
 .contact {
     padding: 80px 64px 120px 64px;
     display: flex;
@@ -184,14 +170,12 @@ body {
     margin-bottom: 60px;
 }
 
-/* Kart alanı */
 .contact-cards {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 32px;
 }
 
-/* Kartın kendisi */
 .contact-card {
     background: linear-gradient(to bottom, #05254a, #0a57a3);
     border-radius: 18px;
@@ -200,26 +184,22 @@ body {
     color: #f9fafb;
 }
 
-/* İkon */
 .contact-card-icon {
     font-size: 40px;
     margin-bottom: 24px;
 }
 
-/* Başlık */
 .contact-card-title {
     font-size: 20px;
     font-weight: 600;
     margin-bottom: 16px;
 }
 
-/* Yazı */
 .contact-card-text {
     font-size: 16px;
     line-height: 1.6;
     color: #e5e7eb;
 }
-/* LOGIN SAYFASI */
 
 .login-section {
     padding: 80px 16px 120px 16px;
@@ -259,7 +239,6 @@ body {
     gap: 24px;
 }
 
-/* input alanları */
 .login-field label {
     display: block;
     font-size: 14px;
@@ -280,7 +259,6 @@ body {
     border-color: #d5a544;
 }
 
-/* Forgot password */
 .login-forgot {
     margin-top: 8px;
     text-align: right;
@@ -292,7 +270,6 @@ body {
     text-decoration: none;
 }
 
-/* Buton */
 .login-button {
     margin-top: 8px;
     width: 100%;
@@ -306,7 +283,6 @@ body {
     cursor: pointer;
 }
 
-/* Alt yazı */
 .login-bottom-text {
     margin-top: 16px;
     font-size: 13px;
@@ -318,7 +294,6 @@ body {
     color: #d5a544;
     text-decoration: none;
 }
-/* SIGNUP SAYFASI */
 
 .signup-title {
     text-align: center;
@@ -334,7 +309,6 @@ body {
     color: #d1d5db;
     margin-bottom: 32px;
 }
-/* DASHBOARD / UPLOAD THESIS SAYFASI */
 
 .dashboard {
     padding: 80px 64px 120px 64px;
@@ -358,7 +332,6 @@ body {
     color: #f9fafb;
 }
 
-/* Üstteki aksiyon kartları */
 .action-card {
     text-align: center;
 }
@@ -374,7 +347,6 @@ body {
     line-height: 1.4;
 }
 
-/* Alttaki doküman kartları */
 .doc-card {
     display: flex;
     flex-direction: column;
@@ -404,7 +376,6 @@ body {
     color: #f9fafb;
     text-decoration: none;
 }
-/* UPLOAD YOUR THESIS SAYFASI */
 
 .upload-section {
     padding: 80px 64px 120px 64px;
@@ -431,7 +402,6 @@ body {
     margin-bottom: 48px;
 }
 
-/* Drag & Drop kutusu */
 .upload-dropzone {
     border: 2px dashed #e5e7eb;
     border-radius: 18px;
@@ -456,7 +426,6 @@ body {
     color: #9ca3af;
 }
 
-/* Alt buton */
 .upload-button {
     padding: 16px 48px;
     border-radius: 999px;
@@ -472,7 +441,6 @@ body {
     color: inherit;
     display: block;
 }
-/* === REPORT PAGE (10. SAYFA) === */
 
 .report-main {
     max-width: 1100px;
@@ -601,7 +569,6 @@ body {
     margin-top: 6px;
 }
 
-/* renkler */
 .detail-dot.blue { background: #4b73ff; }
 .detail-dot.red { background: #ff5c5c; }
 .detail-dot.yellow { background: #f3c54b; }
@@ -627,15 +594,12 @@ body {
     opacity: 0.9;
 }
 
-/* Responsive */
 @media (max-width: 900px) {
     .report-metrics {
         grid-template-columns: 1fr;
     }
 }
-/* ==== MY REPORTS PAGE ==== */
 
-/* My Reports tablosu */
 .reports-table-wrapper {
     max-width: 1100px;
     margin: 48px auto 80px;
@@ -678,7 +642,6 @@ body {
     color: #c3cbe4;
     font-size: 13px;
 }
-/* Checks History başlığı (ortalanmış) */
 .page-title-centered {
     margin-top: 80px;
     text-align: center;
@@ -694,7 +657,6 @@ body {
     font-size: 16px;
 }
 
-/* Checks History tablosu aksiyon sütunu */
 .checks-table .checks-action-col,
 .checks-table .checks-action-cell {
     text-align: right;
@@ -707,9 +669,6 @@ body {
     text-decoration: underline;
     cursor: pointer;
 }
-/* ============================
-   ADMIN DASHBOARD
-   ============================ */
 
 .admin-page {
     display: flex;
@@ -718,7 +677,6 @@ body {
     gap: 0;
 }
 
-/* Sol sidebar */
 .admin-sidebar {
     width: 260px;
     border-right: 1px solid rgba(255, 255, 255, 0.08);
@@ -759,7 +717,6 @@ body {
     opacity: 1;
 }
 
-/* Sağ içerik */
 .admin-main {
     flex: 1;
     padding: 32px 40px;
@@ -771,7 +728,6 @@ body {
     margin-bottom: 24px;
 }
 
-/* Üst kartlar */
 .admin-cards-row {
     display: flex;
     gap: 24px;
@@ -798,7 +754,6 @@ body {
     color: #f7f4ff;
 }
 
-/* Recent Users kısmı */
 .admin-section-title {
     font-size: 20px;
     color: #f5f7ff;
@@ -808,14 +763,11 @@ body {
 .admin-recent-users .reports-table-wrapper {
     margin-top: 0;
 }
-/* ---------- USER DASHBOARD (14. SAYFA) ---------- */
-
 .analytics-main {
     max-width: 1100px;
     margin: 80px auto 96px;
 }
 
-/* Sayfa başlığı */
 .analytics-title {
     font-size: 32px;
     font-weight: 700;
@@ -823,7 +775,6 @@ body {
     margin-bottom: 32px;
 }
 
-/* Üstteki üç kart (Total Checks / Average Plagiarism / Last Report Score) */
 .analytics-kpi-grid {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -850,7 +801,6 @@ body {
     color: #ffffff;
 }
 
-/* Çizgi grafiği kartı */
 .analytics-chart {
     margin-top: 24px;
     margin-bottom: 32px;
@@ -872,7 +822,6 @@ body {
     margin-bottom: 16px;
 }
 
-/* SVG çizgi */
 .analytics-chart-svg {
     display: block;
     width: 100%;
@@ -880,7 +829,7 @@ body {
 }
 
 .analytics-chart-line {
-    fill: none;              /* siyah büyük dolgu GİTTİ */
+    fill: none;
     stroke: #4da3ff;
     stroke-width: 3;
     stroke-linecap: round;
@@ -891,7 +840,6 @@ body {
     fill: #4da3ff;
 }
 
-/* Gün isimleri */
 .analytics-chart-days {
     display: flex;
     justify-content: space-between;
@@ -900,7 +848,6 @@ body {
     color: #a8b3d6;
 }
 
-/* Recent Checks tablosu */
 .analytics-table-wrapper {
     background: radial-gradient(circle at top left, #1f2a4a, #141d36);
     border-radius: 24px;
@@ -936,7 +883,6 @@ body {
     border-bottom: 1px solid rgba(255, 255, 255, 0.04);
 }
 
-/* Küçük ekran (senin pencereyi yarıya indirince olan görünüm) */
 @media (max-width: 980px) {
     .analytics-main {
         margin: 32px 16px 64px;
@@ -955,7 +901,6 @@ body {
         padding: 20px 18px 24px;
     }
 }
-/* ===== Dashboard Top Metric Cards ===== */
 
 .top-metrics {
     display: flex;
@@ -986,7 +931,6 @@ body {
     color: #ffffff;
 }
 
-/* Responsive */
 @media (max-width: 900px) {
     .top-metrics {
         flex-direction: column;

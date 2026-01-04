@@ -7,88 +7,47 @@ import { useAuth } from "../context/AuthContext";
 
 const Navbar = () => {
   const { theme, toggleTheme } = useTheme();
-  const navigate = useNavigate();
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  
-  // Берем ВСЁ из контекста. Это наш единственный источник правды!
   const { isAuthenticated, user, logout } = useAuth();
+  const navigate = useNavigate();
 
-  // Теперь нам не нужны ручные проверки localStorage. 
-  // Используем isAuthenticated из AuthContext.
-  const isLoggedIn = isAuthenticated; 
-  const userEmail = user?.email || "";
-  
-  // Роль тоже берем из объекта юзера, который мы передали в login()
-  const role = (user?.role || "student").toLowerCase();
-  const isAdvisor = role === "advisor" || role === "teacher";
-  const isAdmin = role === "admin";
-
-  const handleLogout = () => {
-    logout(); // Эта функция из контекста уже очищает localStorage и сбрасывает стейт
-    navigate("/");
-  };
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const isDark = theme === "dark";
+  const isLoggedIn = isAuthenticated;
+  const userEmail = user?.email || "";
 
-  // Navbar theme
   const navBg = isDark ? "rgba(2,20,52,0.96)" : "#FFC531";
   const textColor = isDark ? "#ffffff" : "#021434";
-  const borderColor = isDark ? "rgba(255,255,255,0.15)" : "rgba(2,20,52,0.25)";
+  const borderColor = isDark
+    ? "rgba(255,255,255,0.15)"
+    : "rgba(2,20,52,0.25)";
 
-  // Динамические ссылки для сайдбара
-  let roleLinks = [];
-  if (isAdmin) {
-    roleLinks = [
-      { to: "/admin/dashboard", label: "Admin Dashboard" },
-      { to: "/admin/stats", label: "Admin Stats" },
-    ];
-  } else if (isAdvisor) {
-    roleLinks = [
-      { to: "/dashboard", label: "Dashboard" },
-      { to: "/checks-history", label: "History" },
-      { to: "/workspace", label: "Workspace" },
-    ];
-  } else {
-    roleLinks = [
-      { to: "/upload", label: "Upload Thesis" },
-      { to: "/dashboard", label: "Dashboard" },
-      { to: "/my-reports", label: "My Reports" },
-    ];
-  }
+  const handleLogout = () => {
+    logout();
+    navigate("/");
+  };
 
   const linkStyle = ({ isActive }) => ({
     textDecoration: "none",
     color: textColor,
     fontWeight: 900,
     padding: "8px 14px",
-    borderRadius: "999px",
+    borderRadius: 999,
     border: isActive ? `1px solid ${borderColor}` : "1px solid transparent",
-    background: isActive ? (isDark ? "rgba(255,255,255,0.08)" : "rgba(2,20,52,0.10)") : "transparent",
+    background: isActive
+      ? isDark
+        ? "rgba(255,255,255,0.08)"
+        : "rgba(2,20,52,0.10)"
+      : "transparent",
     whiteSpace: "nowrap",
   });
 
-  const Brand = () => (
-    <div
-      onClick={() => navigate("/")}
-      style={{ cursor: "pointer", display: "flex", alignItems: "center", gap: "8px" }}
-    >
-      <LogoMark size={44} />
-      {/* Если хочешь надпись рядом с лого — раскомментируй */}
-      {/* <span style={{ fontWeight: 900, color: textColor }}>THESIS CHECK</span> */}
-    </div>
-  );
-
   return (
     <>
-      {/* Сайдбар теперь управляется состоянием контекста */}
-      {isLoggedIn && (
-        <Sidebar
-          isOpen={sidebarOpen}
-          onClose={() => setSidebarOpen(false)}
-          isLoggedIn={isLoggedIn}
-          roleLinks={roleLinks}
-        />
-      )}
+      <Sidebar
+        isOpen={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
+      />
 
       <header
         style={{
@@ -98,68 +57,61 @@ const Navbar = () => {
           width: "100%",
           background: navBg,
           borderBottom: `1px solid ${borderColor}`,
-          transition: "background 0.3s ease",
         }}
       >
         <div
           style={{
-            width: "100%",
-            padding: "12px 24px",
-            display: "grid",
-            gridTemplateColumns: "auto 1fr auto",
+            display: "flex",
             alignItems: "center",
+            justifyContent: "space-between",
+            padding: "12px 16px",
             gap: 12,
-            boxSizing: "border-box",
           }}
         >
-          {/* LEFT: Бургер или Лого */}
+          {/* LEFT */}
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-            {isLoggedIn ? (
-              <button
-                onClick={() => setSidebarOpen(true)}
-                style={{
-                  border: `1px solid ${borderColor}`,
-                  background: isDark ? "transparent" : "rgba(255,255,255,0.35)",
-                  color: textColor,
-                  borderRadius: 12,
-                  padding: "8px 10px",
-                  cursor: "pointer",
-                  fontWeight: 900,
-                }}
-              >
-                ☰
-              </button>
-            ) : (
-              <Brand />
-            )}
+            <button
+              onClick={() => isLoggedIn && setSidebarOpen(true)}
+              style={{
+                border: `1px solid ${borderColor}`,
+                background: "transparent",
+                color: textColor,
+                borderRadius: 12,
+                padding: "8px 10px",
+                cursor: isLoggedIn ? "pointer" : "default",
+                fontWeight: 900,
+              }}
+              aria-label="Menu"
+            >
+              ☰
+            </button>
+
+            <div className="logo-wrap">
+              <LogoMark height={44} showText />
+            </div>
           </div>
 
-          {/* CENTER: Публичные ссылки или Логоцентр */}
-          <div style={{ display: "flex", justifyContent: "center", gap: 12 }}>
-            {!isLoggedIn ? (
-              <>
-                <NavLink to="/" style={linkStyle}>Home</NavLink>
-                <NavLink to="/about" style={linkStyle}>About</NavLink>
-                <NavLink to="/contact" style={linkStyle}>Contact</NavLink>
-              </>
-            ) : (
-              <Brand />
-            )}
-          </div>
+          {/* CENTER (public, desktop only) */}
+          {!isLoggedIn && (
+            <div className="nav-center">
+              <NavLink to="/" style={linkStyle}>Home</NavLink>
+              <NavLink to="/about" style={linkStyle}>About</NavLink>
+              <NavLink to="/contact" style={linkStyle}>Contact</NavLink>
+            </div>
+          )}
 
-          {/* RIGHT: Email, Тема и Кнопка Auth */}
-          <div style={{ display: "flex", alignItems: "center", gap: 10, justifyContent: "flex-end" }}>
+          {/* RIGHT */}
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             {isLoggedIn && (
               <span
                 style={{
                   fontSize: 13,
                   color: textColor,
-                  opacity: 0.9,
-                  maxWidth: 150,
+                  maxWidth: 160,
                   overflow: "hidden",
                   textOverflow: "ellipsis",
                   whiteSpace: "nowrap",
-                  fontWeight: 600
+                  fontWeight: 600,
                 }}
                 title={userEmail}
               >
@@ -171,26 +123,30 @@ const Navbar = () => {
               onClick={toggleTheme}
               style={{
                 padding: "7px 12px",
-                borderRadius: "999px",
+                borderRadius: 999,
                 border: `1px solid ${borderColor}`,
-                background: isDark ? "transparent" : "rgba(255,255,255,0.35)",
+                background: "transparent",
                 color: textColor,
                 cursor: "pointer",
                 fontWeight: 900,
               }}
             >
-              {isDark ? "🌙 Dark" : "☀️ Light"}
+              {isDark ? "🌙" : "☀️"}
             </button>
 
             <button
               onClick={isLoggedIn ? handleLogout : () => navigate("/login")}
               style={{
                 padding: "9px 16px",
-                borderRadius: "999px",
-                background: isLoggedIn ? (isDark ? "#FFC531" : "#021434") : "#021434",
-                color: isLoggedIn ? (isDark ? "#021434" : "#ffffff") : "#ffffff",
+                borderRadius: 999,
+                background: isLoggedIn
+                  ? isDark ? "#FFC531" : "#021434"
+                  : "#021434",
+                color: isLoggedIn
+                  ? isDark ? "#021434" : "#ffffff"
+                  : "#ffffff",
                 border: "none",
-                fontWeight: 950,
+                fontWeight: 900,
                 cursor: "pointer",
               }}
             >
@@ -199,6 +155,17 @@ const Navbar = () => {
           </div>
         </div>
       </header>
+
+      <style>{`
+        @media (max-width: 768px) {
+          .logo-wrap span {
+            display: none;
+          }
+          .nav-center {
+            display: none;
+          }
+        }
+      `}</style>
     </>
   );
 };

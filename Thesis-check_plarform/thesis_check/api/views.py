@@ -125,7 +125,6 @@ class ResultView(generics.ListAPIView):
 
         if user.role == "advisor":
             return ThesisSubmission.objects.all().order_by("-uploaded_at")
-            # позже можно ограничить advisor → students
 
         return ThesisSubmission.objects.filter(student=user).order_by("-uploaded_at")
 
@@ -144,7 +143,6 @@ class ForgotPasswordView(generics.GenericAPIView):
         try:
             user = CustomUser.objects.get(email=email)
         except CustomUser.DoesNotExist:
-            # Не палим, существует ли пользователь
             return Response(
                 {"detail": "If this email exists, a reset link was sent"},
                 status=status.HTTP_200_OK
@@ -155,20 +153,17 @@ class ForgotPasswordView(generics.GenericAPIView):
 
         reset_link = f"http://localhost:3000/reset-password/{uid}/{token}"
 
-        # 🔥 ДЛЯ УЧЕБНОГО ПРОЕКТА — ЭТО ГЛАВНОЕ
         logger.info(f"PASSWORD RESET LINK: {reset_link}")
         print("\n========== PASSWORD RESET ==========")
         print(f"User: {user.email}")
         print(f"Reset link:\n{reset_link}")
         print("====================================\n")
 
-        # Почта (можно оставить, даже если письма не доходят)
         send_mail(
             subject="Password reset",
             message=f"Reset your password:\n{reset_link}",
             from_email=settings.DEFAULT_FROM_EMAIL,
             recipient_list=[email],
-            #fail_silently=True,
         )
 
         return Response(
